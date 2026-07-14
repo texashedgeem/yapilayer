@@ -1,0 +1,17 @@
+{
+  "name": "@yapilayer/contract-tests",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Contract tests: the generated TypeScript SDK driven against a running platform stack, proving the OpenAPI spec matches the implementation",
+  "license": "Apache-2.0",
+  "type": "module",
+  "scripts": {
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@yapilayer/sdk": "*"
+  },
+  "devDependencies": {
+    "vitest": "^2.1.8"
+  }
+}

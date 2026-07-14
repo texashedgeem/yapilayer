@@ -1,16 +1,16 @@
 # Project Status
 
 **Phase:** 1 — reference implementation
-**Current milestone:** 7 — OpenAPI finalization + SDK generation
+**Current milestone:** 8 — Full-stack Docker Compose hardening
 **Last updated:** 2026-07-14
 
 ## Now
 
-Milestone 7: reconciling the OpenAPI spec against the implementation, generating the Java and TypeScript SDKs, adding contract tests.
+Milestone 8: hardening the compose stack to the complete single-command developer experience — demo apps in the stack, `.env.example`, healthchecks everywhere, clone-to-running verification.
 
 ## Next
 
-Milestone 8 — full-stack Docker Compose hardening (single-command developer experience).
+Milestone 9 — CI/CD completion (enforced scanning, static analysis, release automation).
 
 ## Notes for maintainer
 
@@ -28,6 +28,7 @@ Ten Dependabot PRs (#1–#10) opened on first activation are superseded: majors 
 | 2026-07-14 | M4 complete | AIS vertical slice: consent API → callback → accounts/balances/transactions, Flyway persistence, integration test on Testcontainers + simulator, compose re-verified |
 | 2026-07-14 | M5 complete | PIS vertical slice: payments API → authorise → submit → status lifecycle, signed webhooks with retry (ADR 0011), full journey test incl. HMAC verification |
 | 2026-07-14 | M6 complete | ais-demo + pis-demo SPAs (platform-as-BFF per ADR 0008 resolution), 3 Playwright e2e specs green against the compose stack, public/internal base-url split |
+| 2026-07-14 | M7 complete | TS + Java SDKs generated (ADR 0012), contract tests via generated SDK green, spec lints clean |
 
 ## Blockers
 

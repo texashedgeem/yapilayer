@@ -4,6 +4,13 @@ All notable changes to this project are documented here. Format follows [Keep a 
 
 ## [Unreleased]
 
+### Added — Milestone 7 (OpenAPI finalization + SDKs), 2026-07-14
+- `@yapilayer/sdk` (TypeScript, typescript-fetch, zero runtime deps) generated into `sdk/typescript/src` and building to typed `dist/`
+- Java SDK (`io.yapilayer:yapilayer-sdk-java`, JDK-native HttpClient) generated as a standalone project in `sdk/java`, compile-verified
+- `scripts/generate-sdk.sh`: single regeneration entrypoint — Spectral spec lint (errors fail), both generators, TS build
+- Contract tests (`tests/contract`): full AIS and PIS journeys driven exclusively through the generated TS SDK against the running stack — 3 specs green (ADR 0012)
+- Spectral ruleset (`.spectral.yaml`); spec lints with 0 errors
+
 ### Added — Milestone 6 (Demo applications), 2026-07-14
 - `ais-demo` (React/TS/Vite, port 5173): provider discovery, permission selection, bank authorisation journey, accounts with balances, paginated transactions; denied-consent handling
 - `pis-demo` (React/TS/Vite, port 5174): payment form, bank authorisation, live status polling to completion with lifecycle timeline

@@ -1,0 +1,839 @@
+openapi: 3.0.3
+info:
+  description: |
+    Open-source Open Banking platform API. This specification is the source of
+    truth (spec-first — see ADR 0005): server interfaces and SDKs are generated
+    from this file.
+
+    Skeleton at Milestone 0; AIS paths are designed in Milestone 4, PIS paths
+    in Milestone 5, and the spec is finalized in Milestone 7.
+  license:
+    name: Apache 2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0
+  title: Yapilayer API
+  version: 0.1.0
+servers:
+- description: Local development
+  url: http://localhost:8080/api/v1
+tags:
+- description: Discovery of registered bank providers and their capabilities
+  name: providers
+- description: Consent lifecycle (AIS)
+  name: consents
+- description: "Account information, balances, transactions (AIS)"
+  name: accounts
+- description: Payment initiation and status (PIS)
+  name: payments
+- description: Webhook subscriptions for payment events
+  name: webhooks
+paths:
+  /providers:
+    get:
+      operationId: listProviders
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: "#/components/schemas/Provider"
+                type: array
+          description: Registered providers
+      summary: List registered bank providers and their declared capabilities
+      tags:
+      - providers
+      x-accepts:
+      - application/json
+  /consents:
+    post:
+      operationId: createConsent
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateConsentRequest"
+        required: true
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Consent"
+          description: "Consent created, awaiting customer authorisation"
+      summary: Create an AIS consent and obtain the bank authorisation URL
+      tags:
+      - consents
+      x-content-type: application/json
+      x-accepts:
+      - application/json
+  /consents/{consentId}:
+    get:
+      operationId: getConsent
+      parameters:
+      - explode: false
+        in: path
+        name: consentId
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Consent"
+          description: The consent
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: Resource not found
+      summary: Get consent status
+      tags:
+      - consents
+      x-accepts:
+      - application/json
+  /callback:
+    get:
+      operationId: authorisationCallback
+      parameters:
+      - explode: true
+        in: query
+        name: state
+        required: true
+        schema:
+          type: string
+        style: form
+      - explode: true
+        in: query
+        name: code
+        required: false
+        schema:
+          type: string
+        style: form
+      - explode: true
+        in: query
+        name: error
+        required: false
+        schema:
+          type: string
+        style: form
+      responses:
+        "302":
+          description: Redirects to the client application's redirect URI with consentId
+            and status
+      summary: OAuth callback the bank redirects the customer to after authorisation
+      tags:
+      - consents
+      x-accepts:
+      - application/json
+  /consents/{consentId}/accounts:
+    get:
+      operationId: listAccounts
+      parameters:
+      - explode: false
+        in: path
+        name: consentId
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: "#/components/schemas/Account"
+                type: array
+          description: Accounts
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: Resource not found
+        "409":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: Consent exists but is not in a state permitting data access
+      summary: List accounts available under an authorised consent
+      tags:
+      - accounts
+      x-accepts:
+      - application/json
+  /consents/{consentId}/accounts/{accountId}/balances:
+    get:
+      operationId: getBalances
+      parameters:
+      - explode: false
+        in: path
+        name: consentId
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      - explode: false
+        in: path
+        name: accountId
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: "#/components/schemas/Balance"
+                type: array
+          description: Balances
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: Resource not found
+        "409":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: Consent exists but is not in a state permitting data access
+      summary: Get balances for an account
+      tags:
+      - accounts
+      x-accepts:
+      - application/json
+  /consents/{consentId}/accounts/{accountId}/transactions:
+    get:
+      operationId: getTransactions
+      parameters:
+      - explode: false
+        in: path
+        name: consentId
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      - explode: false
+        in: path
+        name: accountId
+        required: true
+        schema:
+          type: string
+        style: simple
+      - explode: true
+        in: query
+        name: pageKey
+        required: false
+        schema:
+          type: string
+        style: form
+      - explode: true
+        in: query
+        name: pageSize
+        required: false
+        schema:
+          default: 50
+          maximum: 500
+          minimum: 1
+          type: integer
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TransactionPage"
+          description: One page of transactions
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: Resource not found
+        "409":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: Consent exists but is not in a state permitting data access
+      summary: Get transactions for an account (paginated)
+      tags:
+      - accounts
+      x-accepts:
+      - application/json
+  /payments:
+    post:
+      operationId: createPayment
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreatePaymentRequest"
+        required: true
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Payment"
+          description: "Payment created, awaiting customer authorisation"
+      summary: Create a single domestic payment and obtain the bank authorisation
+        URL
+      tags:
+      - payments
+      x-content-type: application/json
+      x-accepts:
+      - application/json
+  /payments/{paymentId}:
+    get:
+      operationId: getPayment
+      parameters:
+      - explode: false
+        in: path
+        name: paymentId
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Payment"
+          description: The payment
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: Resource not found
+      summary: Get payment status (refreshes from the provider while in flight)
+      tags:
+      - payments
+      x-accepts:
+      - application/json
+  /payments/callback:
+    get:
+      operationId: paymentAuthorisationCallback
+      parameters:
+      - explode: true
+        in: query
+        name: state
+        required: true
+        schema:
+          type: string
+        style: form
+      - explode: true
+        in: query
+        name: code
+        required: false
+        schema:
+          type: string
+        style: form
+      - explode: true
+        in: query
+        name: error
+        required: false
+        schema:
+          type: string
+        style: form
+      responses:
+        "302":
+          description: Redirects to the client application's redirect URI with paymentId
+            and status
+      summary: OAuth callback for payment authorisation journeys
+      tags:
+      - payments
+      x-accepts:
+      - application/json
+  /webhooks:
+    get:
+      operationId: listWebhookSubscriptions
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: "#/components/schemas/WebhookSubscription"
+                type: array
+          description: Subscriptions
+      summary: List webhook subscriptions (secrets never returned)
+      tags:
+      - webhooks
+      x-accepts:
+      - application/json
+    post:
+      operationId: createWebhookSubscription
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/createWebhookSubscription_request"
+        required: true
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WebhookSubscription"
+          description: Subscription created (secret is write-only)
+      summary: Register a webhook endpoint for payment events
+      tags:
+      - webhooks
+      x-content-type: application/json
+      x-accepts:
+      - application/json
+components:
+  parameters:
+    ConsentId:
+      explode: false
+      in: path
+      name: consentId
+      required: true
+      schema:
+        format: uuid
+        type: string
+      style: simple
+    AccountId:
+      explode: false
+      in: path
+      name: accountId
+      required: true
+      schema:
+        type: string
+      style: simple
+  responses:
+    NotFound:
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+      description: Resource not found
+    ConsentNotAuthorised:
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+      description: Consent exists but is not in a state permitting data access
+  schemas:
+    Error:
+      example:
+        error: consent_not_authorised
+        message: message
+      properties:
+        error:
+          example: consent_not_authorised
+          type: string
+        message:
+          type: string
+      required:
+      - error
+      - message
+      type: object
+    CreateConsentRequest:
+      example:
+        providerId: mock-bank
+        permissions:
+        - READ_ACCOUNTS
+        - READ_ACCOUNTS
+        redirectUri: https://openapi-generator.tech
+      properties:
+        providerId:
+          example: mock-bank
+          type: string
+        permissions:
+          items:
+            enum:
+            - READ_ACCOUNTS
+            - READ_BALANCES
+            - READ_TRANSACTIONS
+            - READ_IDENTITY
+            type: string
+          type: array
+        redirectUri:
+          description: Where the customer is sent after the platform completes the
+            callback
+          format: uri
+          type: string
+      required:
+      - permissions
+      - providerId
+      - redirectUri
+      type: object
+    Consent:
+      example:
+        consentId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        providerId: providerId
+        status: AWAITING_AUTHORISATION
+        permissions:
+        - permissions
+        - permissions
+        expiresAt: 2000-01-23T04:56:07.000+00:00
+        authorisationUrl: https://openapi-generator.tech
+      properties:
+        consentId:
+          format: uuid
+          type: string
+        providerId:
+          type: string
+        status:
+          enum:
+          - AWAITING_AUTHORISATION
+          - AUTHORISED
+          - REJECTED
+          - REVOKED
+          - EXPIRED
+          type: string
+        permissions:
+          items:
+            type: string
+          type: array
+        expiresAt:
+          format: date-time
+          type: string
+        authorisationUrl:
+          description: Present on creation only — where to send the customer to authorise
+          format: uri
+          nullable: true
+          type: string
+      required:
+      - consentId
+      - expiresAt
+      - permissions
+      - providerId
+      - status
+      type: object
+    Account:
+      example:
+        accountId: accountId
+        nickname: nickname
+        currency: currency
+        type: CURRENT
+        identifiers:
+        - scheme: UK.OBIE.SortCodeAccountNumber
+          identification: identification
+        - scheme: UK.OBIE.SortCodeAccountNumber
+          identification: identification
+      properties:
+        accountId:
+          type: string
+        nickname:
+          type: string
+        currency:
+          type: string
+        type:
+          enum:
+          - CURRENT
+          - SAVINGS
+          - CREDIT_CARD
+          - OTHER
+          type: string
+        identifiers:
+          items:
+            $ref: "#/components/schemas/Account_identifiers_inner"
+          type: array
+      required:
+      - accountId
+      - currency
+      - nickname
+      - type
+      type: object
+    Balance:
+      example:
+        accountId: accountId
+        type: CURRENT
+        amount: "1274.56"
+        currency: GBP
+        timestamp: 2000-01-23T04:56:07.000+00:00
+      properties:
+        accountId:
+          type: string
+        type:
+          enum:
+          - CURRENT
+          - AVAILABLE
+          type: string
+        amount:
+          example: "1274.56"
+          type: string
+        currency:
+          example: GBP
+          type: string
+        timestamp:
+          format: date-time
+          type: string
+      required:
+      - accountId
+      - amount
+      - currency
+      - timestamp
+      - type
+      type: object
+    Transaction:
+      example:
+        transactionId: transactionId
+        amount: "-32.40"
+        currency: currency
+        status: BOOKED
+        bookingDate: 2000-01-23
+        reference: reference
+        merchantName: merchantName
+      properties:
+        transactionId:
+          type: string
+        amount:
+          example: "-32.40"
+          type: string
+        currency:
+          type: string
+        status:
+          enum:
+          - BOOKED
+          - PENDING
+          type: string
+        bookingDate:
+          format: date
+          type: string
+        reference:
+          nullable: true
+          type: string
+        merchantName:
+          nullable: true
+          type: string
+      required:
+      - amount
+      - bookingDate
+      - currency
+      - status
+      - transactionId
+      type: object
+    TransactionPage:
+      example:
+        transactions:
+        - transactionId: transactionId
+          amount: "-32.40"
+          currency: currency
+          status: BOOKED
+          bookingDate: 2000-01-23
+          reference: reference
+          merchantName: merchantName
+        - transactionId: transactionId
+          amount: "-32.40"
+          currency: currency
+          status: BOOKED
+          bookingDate: 2000-01-23
+          reference: reference
+          merchantName: merchantName
+        nextPageKey: nextPageKey
+      properties:
+        transactions:
+          items:
+            $ref: "#/components/schemas/Transaction"
+          type: array
+        nextPageKey:
+          nullable: true
+          type: string
+      required:
+      - transactions
+      type: object
+    CreatePaymentRequest:
+      example:
+        providerId: mock-bank
+        amount: "25.00"
+        currency: GBP
+        creditor:
+          name: name
+          scheme: UK.OBIE.SortCodeAccountNumber
+          identification: identification
+        reference: reference
+        redirectUri: https://openapi-generator.tech
+      properties:
+        providerId:
+          example: mock-bank
+          type: string
+        amount:
+          example: "25.00"
+          type: string
+        currency:
+          example: GBP
+          type: string
+        creditor:
+          $ref: "#/components/schemas/CreatePaymentRequest_creditor"
+        reference:
+          type: string
+        redirectUri:
+          format: uri
+          type: string
+      required:
+      - amount
+      - creditor
+      - currency
+      - providerId
+      - redirectUri
+      - reference
+      type: object
+    Payment:
+      example:
+        paymentId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        providerId: providerId
+        status: PENDING
+        amount: amount
+        currency: currency
+        creditorName: creditorName
+        reference: reference
+        createdAt: 2000-01-23T04:56:07.000+00:00
+        updatedAt: 2000-01-23T04:56:07.000+00:00
+        authorisationUrl: https://openapi-generator.tech
+      properties:
+        paymentId:
+          format: uuid
+          type: string
+        providerId:
+          type: string
+        status:
+          enum:
+          - PENDING
+          - AUTHORISED
+          - REJECTED
+          - COMPLETED
+          - CANCELLED
+          type: string
+        amount:
+          type: string
+        currency:
+          type: string
+        creditorName:
+          type: string
+        reference:
+          type: string
+        createdAt:
+          format: date-time
+          type: string
+        updatedAt:
+          format: date-time
+          type: string
+        authorisationUrl:
+          description: Present on creation only
+          format: uri
+          nullable: true
+          type: string
+      required:
+      - amount
+      - creditorName
+      - currency
+      - paymentId
+      - providerId
+      - reference
+      - status
+      type: object
+    WebhookSubscription:
+      example:
+        id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        url: https://openapi-generator.tech
+      properties:
+        id:
+          format: uuid
+          type: string
+        url:
+          format: uri
+          type: string
+      required:
+      - id
+      - url
+      type: object
+    Provider:
+      example:
+        id: mock-bank
+        name: Mock Bank
+        country: GB
+        capabilities:
+        - AIS
+        - PIS
+      properties:
+        id:
+          example: mock-bank
+          type: string
+        name:
+          example: Mock Bank
+          type: string
+        country:
+          description: ISO 3166-1 alpha-2
+          example: GB
+          type: string
+        capabilities:
+          example:
+          - AIS
+          - PIS
+          items:
+            enum:
+            - AIS
+            - PIS
+            - COP
+            - VRP
+            type: string
+          type: array
+      required:
+      - capabilities
+      - country
+      - id
+      - name
+      type: object
+    createWebhookSubscription_request:
+      properties:
+        url:
+          format: uri
+          type: string
+        secret:
+          description: "Signs each delivery (HMAC-SHA256 over the raw body, sent as\
+            \ X-Yapilayer-Signature sha256=hex)"
+          minLength: 16
+          type: string
+      required:
+      - secret
+      - url
+      type: object
+    Account_identifiers_inner:
+      example:
+        scheme: UK.OBIE.SortCodeAccountNumber
+        identification: identification
+      properties:
+        scheme:
+          example: UK.OBIE.SortCodeAccountNumber
+          type: string
+        identification:
+          type: string
+      type: object
+    CreatePaymentRequest_creditor:
+      example:
+        name: name
+        scheme: UK.OBIE.SortCodeAccountNumber
+        identification: identification
+      properties:
+        name:
+          type: string
+        scheme:
+          example: UK.OBIE.SortCodeAccountNumber
+          type: string
+        identification:
+          type: string
+      required:
+      - identification
+      - name
+      - scheme
+      type: object
+
