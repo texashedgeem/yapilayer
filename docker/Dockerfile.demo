@@ -13,4 +13,7 @@ ARG PORT=5173
 COPY --from=build /workspace/demo/${APP}/dist /usr/share/nginx/html
 COPY docker/nginx-demo.conf.template /etc/nginx/templates/default.conf.template
 ENV NGINX_PORT=${PORT}
+# The base image already runs as this user; the explicit directive is for
+# static analysers (Trivy DS-0002) that can't see into the base image.
+USER nginx
 EXPOSE ${PORT}
