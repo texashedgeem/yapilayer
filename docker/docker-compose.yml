@@ -54,5 +54,41 @@ services:
       timeout: 3s
       retries: 12
 
+  ais-demo:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.demo
+      args:
+        APP: ais-demo
+        PORT: 5173
+    ports:
+      - "5173:5173"
+    depends_on:
+      platform:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:5173/ > /dev/null"]
+      interval: 10s
+      timeout: 3s
+      retries: 6
+
+  pis-demo:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.demo
+      args:
+        APP: pis-demo
+        PORT: 5174
+    ports:
+      - "5174:5174"
+    depends_on:
+      platform:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:5174/ > /dev/null"]
+      interval: 10s
+      timeout: 3s
+      retries: 6
+
 volumes:
   postgres-data:

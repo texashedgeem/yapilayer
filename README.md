@@ -6,15 +6,27 @@ Yapilayer aims to be an open-source alternative to commercial Open Banking provi
 
 ## Status
 
-**Phase 1 (reference implementation) in progress** — see [PROJECT_STATUS.md](./PROJECT_STATUS.md) for the current milestone and [ROADMAP.md](./ROADMAP.md) for the plan. Not yet usable; the first end-to-end AIS/PIS journeys against the bundled mock bank arrive over the coming milestones.
+**Phase 1 (reference implementation) in progress** — see [PROJECT_STATUS.md](./PROJECT_STATUS.md) for the current milestone and [ROADMAP.md](./ROADMAP.md) for the plan. End-to-end AIS and PIS journeys work today against the bundled mock bank.
 
-## Quick start (for contributors)
+## Quick start
 
-Prerequisites: Java 21, Node 20+, Docker with Compose.
+Only Docker (with Compose) is required:
 
 ```bash
 git clone https://github.com/texashedgeem/yapilayer.git
-cd yapilayer
+cd yapilayer/docker
+docker compose up -d --build
+```
+
+Then open:
+
+- **http://localhost:5173** — AIS demo: connect the mock bank, authorise, browse accounts, balances and transactions
+- **http://localhost:5174** — PIS demo: create a payment, authorise it, watch the lifecycle complete
+- **http://localhost:8080/api/v1/providers** — the platform API directly
+
+For local development (Java 21, Node 20+):
+
+```bash
 ./scripts/setup.sh   # checks prerequisites, builds JVM modules, installs TS workspaces
 ```
 

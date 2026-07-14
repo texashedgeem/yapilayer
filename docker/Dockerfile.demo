@@ -1,0 +1,15 @@
+# Builds either demo app (select with --build-arg APP=ais-demo|pis-demo)
+# and serves it with nginx, proxying /api to the platform container.
+FROM node:20-alpine AS build
+ARG APP
+WORKDIR /workspace
+COPY . .
+RUN npm ci && npm run build -w @yapilayer/${APP}
+
+FROM nginx:1.27-alpine
+ARG APP
+ARG PORT=5173
+COPY --from=build /workspace/demo/${APP}/dist /usr/share/nginx/html
+COPY docker/nginx-demo.conf.template /etc/nginx/templates/default.conf.template
+ENV NGINX_PORT=${PORT}
+EXPOSE ${PORT}

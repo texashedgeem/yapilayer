@@ -4,6 +4,15 @@ All notable changes to this project are documented here. Format follows [Keep a 
 
 ## [Unreleased]
 
+### Added — Milestone 8 (Full-stack Docker Compose), 2026-07-14
+- Demo apps containerized: multi-stage node build → nginx serving the built SPA with `/api` proxied to the platform (SPA-fallback routing for `/connected` and `/paid`)
+- Complete five-service stack (postgres, mock-bank, platform, ais-demo, pis-demo) healthy from one `docker compose up -d --build` — no local toolchain needed
+- `docker/.env.example`; docker/README service table; root README quickstart rewritten around the single-command experience
+- Playwright e2e suite verified green against the fully containerized stack (nginx-served demos)
+
+### Fixed — Milestone 8
+- Demo healthchecks use 127.0.0.1 — in-container `localhost` resolves to `::1` while nginx listens IPv4-only
+
 ### Added — Milestone 7 (OpenAPI finalization + SDKs), 2026-07-14
 - `@yapilayer/sdk` (TypeScript, typescript-fetch, zero runtime deps) generated into `sdk/typescript/src` and building to typed `dist/`
 - Java SDK (`io.yapilayer:yapilayer-sdk-java`, JDK-native HttpClient) generated as a standalone project in `sdk/java`, compile-verified
