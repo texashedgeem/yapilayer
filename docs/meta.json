@@ -1,0 +1,19 @@
+{
+  "title": "Yapilayer",
+  "pages": [
+    "index",
+    "getting-started",
+    "installation",
+    "quickstart",
+    "authentication",
+    "ais",
+    "pis",
+    "providers",
+    "sdk",
+    "architecture",
+    "security",
+    "deployment",
+    "contributing",
+    "troubleshooting"
+  ]
+}
