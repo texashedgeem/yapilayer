@@ -12,6 +12,7 @@ dependencyManagement {
 dependencies {
     implementation(project(":platform:platform-domain"))
     implementation(project(":platform:platform-application"))
+    implementation(project(":platform:platform-webhooks"))
     implementation(project(":providers:provider-sdk"))
     implementation("org.springframework.boot:spring-boot-starter-web")
 }

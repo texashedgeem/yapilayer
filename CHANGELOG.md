@@ -4,6 +4,15 @@ All notable changes to this project are documented here. Format follows [Keep a 
 
 ## [Unreleased]
 
+### Added — Milestone 5 (PIS vertical slice), 2026-07-14
+- `platform-application`: framework-free PisService — payment creation with provider payment consent, authorisation callback that submits the payment, status refresh from the provider with domain state-machine enforcement, webhook publication on every status change
+- `platform-webhooks`: WebhookDispatcher — at-least-once delivery, `X-Yapilayer-Signature` HMAC-SHA256 over raw body, 3 attempts with backoff (ADR 0011); subscription model with write-only secrets
+- `platform-persistence`: Payment/PaymentSession/WebhookSubscription entities + adapters, Flyway `V2__payments_webhooks.sql`
+- `platform-api`: `/api/v1/payments` (create/get), `/api/v1/payments/callback` (separate from the AIS callback), `/api/v1/webhooks` (create/list)
+- OpenAPI spec: payments and webhooks paths + schemas
+- Integration test: full PIS journey through the public API — create → authorise → callback-submits → poll to COMPLETED — with a local webhook receiver asserting both events arrive correctly HMAC-signed
+- ADR 0011 recorded; durable-outbox deferral tracked in TECH_DEBT.md
+
 ### Added — Milestone 4 (AIS vertical slice), 2026-07-14
 - `platform-application`: framework-free AisService (consent creation with anti-CSRF state, authorisation callback with code exchange, denied handling, account/balance/transaction access with consent-state and expiry enforcement) behind ConsentRepositoryPort/SessionStorePort
 - `platform-persistence`: Consent + ProviderSession JPA entities and port adapters (domain stays JPA-free per ADR 0007), Flyway `V1__init.sql` (consents, provider_sessions, tenant_id per ADR 0009)

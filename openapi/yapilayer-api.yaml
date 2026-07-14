@@ -24,6 +24,8 @@ tags:
     description: Account information, balances, transactions (AIS)
   - name: payments
     description: Payment initiation and status (PIS)
+  - name: webhooks
+    description: Webhook subscriptions for payment events
 paths:
   /providers:
     get:
@@ -158,6 +160,100 @@ paths:
           $ref: "#/components/responses/NotFound"
         "409":
           $ref: "#/components/responses/ConsentNotAuthorised"
+  /payments:
+    post:
+      tags: [payments]
+      operationId: createPayment
+      summary: Create a single domestic payment and obtain the bank authorisation URL
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreatePaymentRequest"
+      responses:
+        "201":
+          description: Payment created, awaiting customer authorisation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Payment"
+  /payments/{paymentId}:
+    get:
+      tags: [payments]
+      operationId: getPayment
+      summary: Get payment status (refreshes from the provider while in flight)
+      parameters:
+        - name: paymentId
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        "200":
+          description: The payment
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Payment"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /payments/callback:
+    get:
+      tags: [payments]
+      operationId: paymentAuthorisationCallback
+      summary: OAuth callback for payment authorisation journeys
+      parameters:
+        - name: state
+          in: query
+          required: true
+          schema: { type: string }
+        - name: code
+          in: query
+          schema: { type: string }
+        - name: error
+          in: query
+          schema: { type: string }
+      responses:
+        "302":
+          description: Redirects to the client application's redirect URI with paymentId and status
+  /webhooks:
+    post:
+      tags: [webhooks]
+      operationId: createWebhookSubscription
+      summary: Register a webhook endpoint for payment events
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [url, secret]
+              properties:
+                url: { type: string, format: uri }
+                secret:
+                  type: string
+                  minLength: 16
+                  description: Signs each delivery (HMAC-SHA256 over the raw body, sent as X-Yapilayer-Signature sha256=hex)
+      responses:
+        "201":
+          description: Subscription created (secret is write-only)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WebhookSubscription"
+    get:
+      tags: [webhooks]
+      operationId: listWebhookSubscriptions
+      summary: List webhook subscriptions (secrets never returned)
+      responses:
+        "200":
+          description: Subscriptions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/WebhookSubscription"
 components:
   parameters:
     ConsentId:
@@ -287,6 +383,48 @@ components:
         nextPageKey:
           type: string
           nullable: true
+    CreatePaymentRequest:
+      type: object
+      required: [providerId, amount, currency, creditor, reference, redirectUri]
+      properties:
+        providerId: { type: string, example: mock-bank }
+        amount: { type: string, example: "25.00" }
+        currency: { type: string, example: GBP }
+        creditor:
+          type: object
+          required: [name, scheme, identification]
+          properties:
+            name: { type: string }
+            scheme: { type: string, example: UK.OBIE.SortCodeAccountNumber }
+            identification: { type: string }
+        reference: { type: string }
+        redirectUri: { type: string, format: uri }
+    Payment:
+      type: object
+      required: [paymentId, providerId, status, amount, currency, creditorName, reference]
+      properties:
+        paymentId: { type: string, format: uuid }
+        providerId: { type: string }
+        status:
+          type: string
+          enum: [PENDING, AUTHORISED, REJECTED, COMPLETED, CANCELLED]
+        amount: { type: string }
+        currency: { type: string }
+        creditorName: { type: string }
+        reference: { type: string }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+        authorisationUrl:
+          type: string
+          format: uri
+          nullable: true
+          description: Present on creation only
+    WebhookSubscription:
+      type: object
+      required: [id, url]
+      properties:
+        id: { type: string, format: uuid }
+        url: { type: string, format: uri }
     Provider:
       type: object
       required: [id, name, country, capabilities]

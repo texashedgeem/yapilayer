@@ -12,5 +12,6 @@ dependencyManagement {
 dependencies {
     api(project(":platform:platform-domain"))
     implementation(project(":platform:platform-application"))
+    implementation(project(":platform:platform-webhooks"))
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 }

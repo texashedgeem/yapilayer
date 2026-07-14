@@ -1,16 +1,16 @@
 # Project Status
 
 **Phase:** 1 — reference implementation
-**Current milestone:** 5 — PIS vertical slice
+**Current milestone:** 6 — Demo applications
 **Last updated:** 2026-07-14
 
 ## Now
 
-Milestone 5: the platform-side PIS vertical slice — payment creation, authorisation, status lifecycle, webhook dispatch with retry and signature verification.
+Milestone 6: AIS and PIS demo applications (React/TypeScript, BFF pattern per ADR 0008) wired against the platform API, plus Playwright e2e tests.
 
 ## Next
 
-Milestone 6 — AIS/PIS demo applications (React/TS, BFF pattern).
+Milestone 7 — OpenAPI reconciliation + Java/TypeScript SDK generation.
 
 ## Notes for maintainer
 
@@ -26,6 +26,7 @@ Ten Dependabot PRs (#1–#10) opened on first activation are superseded: majors 
 | 2026-07-14 | M2 complete | Domain aggregates + provider-sdk contract + ADR 0009, 18 unit tests green |
 | 2026-07-14 | M3 complete | Mock bank simulator + connector, end-to-end AIS/PIS acceptance test, compose stack healthy (3 services), ADR 0010 |
 | 2026-07-14 | M4 complete | AIS vertical slice: consent API → callback → accounts/balances/transactions, Flyway persistence, integration test on Testcontainers + simulator, compose re-verified |
+| 2026-07-14 | M5 complete | PIS vertical slice: payments API → authorise → submit → status lifecycle, signed webhooks with retry (ADR 0011), full journey test incl. HMAC verification |
 
 ## Blockers
 
