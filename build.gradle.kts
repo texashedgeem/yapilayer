@@ -31,5 +31,11 @@ subprojects {
         tasks.withType<Test>().configureEach {
             useJUnitPlatform()
         }
+
+        // Spring resolves @PathVariable/@RequestParam names reflectively;
+        // the Boot plugin adds this flag but plain java-library modules don't.
+        tasks.withType<JavaCompile>().configureEach {
+            options.compilerArgs.add("-parameters")
+        }
     }
 }

@@ -4,6 +4,19 @@ All notable changes to this project are documented here. Format follows [Keep a 
 
 ## [Unreleased]
 
+### Added — Milestone 4 (AIS vertical slice), 2026-07-14
+- `platform-application`: framework-free AisService (consent creation with anti-CSRF state, authorisation callback with code exchange, denied handling, account/balance/transaction access with consent-state and expiry enforcement) behind ConsentRepositoryPort/SessionStorePort
+- `platform-persistence`: Consent + ProviderSession JPA entities and port adapters (domain stays JPA-free per ADR 0007), Flyway `V1__init.sql` (consents, provider_sessions, tenant_id per ADR 0009)
+- `platform-api`: `/api/v1/providers`, `/api/v1/consents` (create/get), `/api/v1/callback`, `/api/v1/consents/{id}/accounts[/{id}/balances|/transactions]`, consistent error mapping (404/409/400/502)
+- `platform-bootstrap`: datasource/Flyway/JPA wiring, AisService bean, env-based configuration
+- OpenAPI spec: all implemented AIS paths and schemas (spec kept current per ADR 0005)
+- Integration test: full AIS journey through the public API on Testcontainers PostgreSQL + live simulator, including pagination and unauthorised-access rejection
+- Compose: platform now wired to postgres (datasource env), full stack re-verified healthy with API smoke test
+
+### Fixed — Milestone 4
+- `-parameters` compiler flag applied to all Java modules (Spring path-variable resolution failed in plain java-library modules)
+- JPA repository/entity scanning made explicit (`@EnableJpaRepositories`/`@EntityScan` — `scanBasePackages` does not cover them)
+
 ### Added — Milestone 3 (Mock bank connector), 2026-07-14
 - `mock-bank-simulator`: standalone fake ASPSP — OAuth 2.0 authorisation-code journey with consent decision page, OB Read/Write-style AIS endpoints (account-access-consents, accounts, balances, paginated transactions) and PIS endpoints (domestic-payment-consents, domestic-payments with auto-advancing status lifecycle), bearer-token enforcement, seeded two-account test persona
 - `mock-bank-connector`: framework-free (JDK HTTP client + Jackson) implementation of provider-sdk against the simulator

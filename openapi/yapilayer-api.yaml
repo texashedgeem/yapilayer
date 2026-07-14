@@ -39,8 +39,254 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/Provider"
+  /consents:
+    post:
+      tags: [consents]
+      operationId: createConsent
+      summary: Create an AIS consent and obtain the bank authorisation URL
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateConsentRequest"
+      responses:
+        "201":
+          description: Consent created, awaiting customer authorisation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Consent"
+  /consents/{consentId}:
+    get:
+      tags: [consents]
+      operationId: getConsent
+      summary: Get consent status
+      parameters:
+        - $ref: "#/components/parameters/ConsentId"
+      responses:
+        "200":
+          description: The consent
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Consent"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /callback:
+    get:
+      tags: [consents]
+      operationId: authorisationCallback
+      summary: OAuth callback the bank redirects the customer to after authorisation
+      parameters:
+        - name: state
+          in: query
+          required: true
+          schema: { type: string }
+        - name: code
+          in: query
+          schema: { type: string }
+        - name: error
+          in: query
+          schema: { type: string }
+      responses:
+        "302":
+          description: Redirects to the client application's redirect URI with consentId and status
+  /consents/{consentId}/accounts:
+    get:
+      tags: [accounts]
+      operationId: listAccounts
+      summary: List accounts available under an authorised consent
+      parameters:
+        - $ref: "#/components/parameters/ConsentId"
+      responses:
+        "200":
+          description: Accounts
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Account"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/ConsentNotAuthorised"
+  /consents/{consentId}/accounts/{accountId}/balances:
+    get:
+      tags: [accounts]
+      operationId: getBalances
+      summary: Get balances for an account
+      parameters:
+        - $ref: "#/components/parameters/ConsentId"
+        - $ref: "#/components/parameters/AccountId"
+      responses:
+        "200":
+          description: Balances
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Balance"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/ConsentNotAuthorised"
+  /consents/{consentId}/accounts/{accountId}/transactions:
+    get:
+      tags: [accounts]
+      operationId: getTransactions
+      summary: Get transactions for an account (paginated)
+      parameters:
+        - $ref: "#/components/parameters/ConsentId"
+        - $ref: "#/components/parameters/AccountId"
+        - name: pageKey
+          in: query
+          schema: { type: string }
+        - name: pageSize
+          in: query
+          schema: { type: integer, default: 50, minimum: 1, maximum: 500 }
+      responses:
+        "200":
+          description: One page of transactions
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TransactionPage"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/ConsentNotAuthorised"
 components:
+  parameters:
+    ConsentId:
+      name: consentId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    AccountId:
+      name: accountId
+      in: path
+      required: true
+      schema:
+        type: string
+  responses:
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    ConsentNotAuthorised:
+      description: Consent exists but is not in a state permitting data access
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
   schemas:
+    Error:
+      type: object
+      required: [error, message]
+      properties:
+        error:
+          type: string
+          example: consent_not_authorised
+        message:
+          type: string
+    CreateConsentRequest:
+      type: object
+      required: [providerId, permissions, redirectUri]
+      properties:
+        providerId:
+          type: string
+          example: mock-bank
+        permissions:
+          type: array
+          items:
+            type: string
+            enum: [READ_ACCOUNTS, READ_BALANCES, READ_TRANSACTIONS, READ_IDENTITY]
+        redirectUri:
+          type: string
+          format: uri
+          description: Where the customer is sent after the platform completes the callback
+    Consent:
+      type: object
+      required: [consentId, providerId, status, permissions, expiresAt]
+      properties:
+        consentId:
+          type: string
+          format: uuid
+        providerId:
+          type: string
+        status:
+          type: string
+          enum: [AWAITING_AUTHORISATION, AUTHORISED, REJECTED, REVOKED, EXPIRED]
+        permissions:
+          type: array
+          items: { type: string }
+        expiresAt:
+          type: string
+          format: date-time
+        authorisationUrl:
+          type: string
+          format: uri
+          nullable: true
+          description: Present on creation only — where to send the customer to authorise
+    Account:
+      type: object
+      required: [accountId, nickname, currency, type]
+      properties:
+        accountId: { type: string }
+        nickname: { type: string }
+        currency: { type: string }
+        type:
+          type: string
+          enum: [CURRENT, SAVINGS, CREDIT_CARD, OTHER]
+        identifiers:
+          type: array
+          items:
+            type: object
+            properties:
+              scheme: { type: string, example: UK.OBIE.SortCodeAccountNumber }
+              identification: { type: string }
+    Balance:
+      type: object
+      required: [accountId, type, amount, currency, timestamp]
+      properties:
+        accountId: { type: string }
+        type:
+          type: string
+          enum: [CURRENT, AVAILABLE]
+        amount: { type: string, example: "1274.56" }
+        currency: { type: string, example: GBP }
+        timestamp: { type: string, format: date-time }
+    Transaction:
+      type: object
+      required: [transactionId, amount, currency, status, bookingDate]
+      properties:
+        transactionId: { type: string }
+        amount: { type: string, example: "-32.40" }
+        currency: { type: string }
+        status:
+          type: string
+          enum: [BOOKED, PENDING]
+        bookingDate: { type: string, format: date }
+        reference: { type: string, nullable: true }
+        merchantName: { type: string, nullable: true }
+    TransactionPage:
+      type: object
+      required: [transactions]
+      properties:
+        transactions:
+          type: array
+          items:
+            $ref: "#/components/schemas/Transaction"
+        nextPageKey:
+          type: string
+          nullable: true
     Provider:
       type: object
       required: [id, name, country, capabilities]

@@ -10,3 +10,4 @@ Deliberate shortcuts and revisit-later decisions. Nothing enters this file silen
 | Root-build `subprojects {}` convention block instead of convention plugins | Milestone 0 simplicity choice | Module count or per-module config divergence makes the root build hard to read |
 | `platform-bootstrap` scans `io.yapilayer` broadly instead of explicit configuration imports | Milestone 0 | Module auto-configuration matures (candidate: per-module @AutoConfiguration) |
 | Demo app BFF topology unresolved (platform-served vs sidecar) | ADR 0008 | Milestone 6 |
+| Connector base-url serves double duty: API calls (container network) and browser-facing authorisation URLs — in compose, the authorise URL is `http://mock-bank:8090/...`, unresolvable from a host browser | Milestone 4 compose verification | Milestone 6/8: split internal vs public base URL config |
