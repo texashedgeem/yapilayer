@@ -20,7 +20,7 @@ jobs:
       - name: Build release artifacts
         run: ./gradlew build
       - name: Upload boot jars
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: yapilayer-${{ github.ref_name }}
           path: |
