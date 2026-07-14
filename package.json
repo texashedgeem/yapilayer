@@ -1,0 +1,11 @@
+{
+  "name": "yapilayer-workspace",
+  "private": true,
+  "description": "npm workspace root for Yapilayer's TypeScript packages (demo apps and generated SDK)",
+  "license": "Apache-2.0",
+  "workspaces": [
+    "demo/ais-demo",
+    "demo/pis-demo",
+    "sdk/typescript"
+  ]
+}

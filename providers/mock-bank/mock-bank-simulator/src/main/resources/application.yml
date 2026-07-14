@@ -1,0 +1,13 @@
+spring:
+  application:
+    name: mock-bank-simulator
+
+server:
+  port: 8090
+  shutdown: graceful
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info

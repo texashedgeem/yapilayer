@@ -6,13 +6,35 @@ Yapilayer aims to be an open-source alternative to commercial Open Banking provi
 
 ## Status
 
-Early planning stage. No implementation yet. See the foundational documents below for scope and direction.
+**Phase 1 (reference implementation) in progress** — see [PROJECT_STATUS.md](./PROJECT_STATUS.md) for the current milestone and [ROADMAP.md](./ROADMAP.md) for the plan. Not yet usable; the first end-to-end AIS/PIS journeys against the bundled mock bank arrive over the coming milestones.
 
-## Foundational Documents
+## Quick start (for contributors)
 
-- [`PROJECT_CONSTITUTION.md`](./PROJECT_CONSTITUTION.md) — vision, mission, principles, and operating model
-- [`PRODUCT_REQUIREMENTS.md`](./PRODUCT_REQUIREMENTS.md) — functional scope (AIS, PIS, consent, bank support)
-- [`ENGINEERING_STANDARDS.md`](./ENGINEERING_STANDARDS.md) — architecture, tech stack, security, and testing standards
+Prerequisites: Java 21, Node 20+, Docker with Compose.
+
+```bash
+git clone https://github.com/texashedgeem/yapilayer.git
+cd yapilayer
+./scripts/setup.sh   # checks prerequisites, builds JVM modules, installs TS workspaces
+```
+
+See [CONTRIBUTING.md](./CONTRIBUTING.md) for the full guide.
+
+## Architecture at a glance
+
+A modular Spring Boot core exposing stable AIS/PIS APIs, with all bank connectivity delivered through a plugin framework — adding a bank means adding a connector module, never changing the core. Full detail and diagrams in [ARCHITECTURE.md](./ARCHITECTURE.md).
+
+```
+Core Platform  →  Provider Interface (provider-sdk)  →  Bank Connector Plugins
+```
+
+## Project documents
+
+- [PROJECT_CONSTITUTION.md](./PROJECT_CONSTITUTION.md) — vision, mission, principles, operating model
+- [PRODUCT_REQUIREMENTS.md](./PRODUCT_REQUIREMENTS.md) — functional scope (AIS, PIS, consent, bank support)
+- [ENGINEERING_STANDARDS.md](./ENGINEERING_STANDARDS.md) — architecture, stack, security, testing standards
+- [ROADMAP.md](./ROADMAP.md) · [ARCHITECTURE.md](./ARCHITECTURE.md) · [DECISIONS.md](./DECISIONS.md) · [CHANGELOG.md](./CHANGELOG.md)
+- [SECURITY.md](./SECURITY.md) — security policy and Phase 1 scope limitations
 
 ## License
 

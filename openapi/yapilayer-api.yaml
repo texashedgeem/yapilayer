@@ -1,0 +1,63 @@
+openapi: 3.0.3
+info:
+  title: Yapilayer API
+  version: 0.1.0
+  description: |
+    Open-source Open Banking platform API. This specification is the source of
+    truth (spec-first — see ADR 0005): server interfaces and SDKs are generated
+    from this file.
+
+    Skeleton at Milestone 0; AIS paths are designed in Milestone 4, PIS paths
+    in Milestone 5, and the spec is finalized in Milestone 7.
+  license:
+    name: Apache 2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0
+servers:
+  - url: http://localhost:8080/api/v1
+    description: Local development
+tags:
+  - name: providers
+    description: Discovery of registered bank providers and their capabilities
+  - name: consents
+    description: Consent lifecycle (AIS)
+  - name: accounts
+    description: Account information, balances, transactions (AIS)
+  - name: payments
+    description: Payment initiation and status (PIS)
+paths:
+  /providers:
+    get:
+      tags: [providers]
+      operationId: listProviders
+      summary: List registered bank providers and their declared capabilities
+      responses:
+        "200":
+          description: Registered providers
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Provider"
+components:
+  schemas:
+    Provider:
+      type: object
+      required: [id, name, country, capabilities]
+      properties:
+        id:
+          type: string
+          example: mock-bank
+        name:
+          type: string
+          example: Mock Bank
+        country:
+          type: string
+          description: ISO 3166-1 alpha-2
+          example: GB
+        capabilities:
+          type: array
+          items:
+            type: string
+            enum: [AIS, PIS, COP, VRP]
+          example: [AIS, PIS]

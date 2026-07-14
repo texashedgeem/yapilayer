@@ -1,0 +1,7 @@
+{
+  "name": "@yapilayer/sdk",
+  "version": "0.1.0",
+  "private": true,
+  "description": "TypeScript SDK generated from the Yapilayer OpenAPI specification (generated in Milestone 7)",
+  "license": "Apache-2.0"
+}
