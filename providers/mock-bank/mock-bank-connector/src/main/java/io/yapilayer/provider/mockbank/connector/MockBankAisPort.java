@@ -32,9 +32,11 @@ final class MockBankAisPort implements AisProviderPort {
     private static final String AISP = "/open-banking/v3.1/aisp";
 
     private final MockBankHttp http;
+    private final URI publicBaseUrl;
 
-    MockBankAisPort(MockBankHttp http) {
+    MockBankAisPort(MockBankHttp http, URI publicBaseUrl) {
         this.http = http;
+        this.publicBaseUrl = publicBaseUrl;
     }
 
     @Override
@@ -55,7 +57,7 @@ final class MockBankAisPort implements AisProviderPort {
                 null);
 
         String consentId = response.at("/Data/ConsentId").asText();
-        URI authoriseUrl = http.resolve("/oauth/authorize"
+        URI authoriseUrl = publicBaseUrl.resolve("/oauth/authorize"
                 + "?consent_id=" + encode(consentId)
                 + "&redirect_uri=" + encode(request.redirectUri().toString())
                 + "&state=" + encode(request.state()));

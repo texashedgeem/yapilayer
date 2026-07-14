@@ -20,9 +20,11 @@ final class MockBankPisPort implements PisProviderPort {
     private static final String PISP = "/open-banking/v3.1/pisp";
 
     private final MockBankHttp http;
+    private final URI publicBaseUrl;
 
-    MockBankPisPort(MockBankHttp http) {
+    MockBankPisPort(MockBankHttp http, URI publicBaseUrl) {
         this.http = http;
+        this.publicBaseUrl = publicBaseUrl;
     }
 
     @Override
@@ -40,7 +42,7 @@ final class MockBankPisPort implements PisProviderPort {
                 null);
 
         String consentId = response.at("/Data/ConsentId").asText();
-        URI authoriseUrl = http.resolve("/oauth/authorize"
+        URI authoriseUrl = publicBaseUrl.resolve("/oauth/authorize"
                 + "?consent_id=" + encode(consentId)
                 + "&redirect_uri=" + encode(request.redirectUri().toString())
                 + "&state=" + encode(request.state()));

@@ -6,6 +6,7 @@
   "workspaces": [
     "demo/ais-demo",
     "demo/pis-demo",
-    "sdk/typescript"
+    "sdk/typescript",
+    "tests/e2e"
   ]
 }

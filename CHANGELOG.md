@@ -4,6 +4,14 @@ All notable changes to this project are documented here. Format follows [Keep a 
 
 ## [Unreleased]
 
+### Added — Milestone 6 (Demo applications), 2026-07-14
+- `ais-demo` (React/TS/Vite, port 5173): provider discovery, permission selection, bank authorisation journey, accounts with balances, paginated transactions; denied-consent handling
+- `pis-demo` (React/TS/Vite, port 5174): payment form, bank authorisation, live status polling to completion with lifecycle timeline
+- Playwright e2e suite (`tests/e2e`): three specs covering the complete AIS journey (incl. pagination), denied authorisation, and the complete PIS journey — all passing against the containerized stack
+- ADR 0008 resolved: platform-as-BFF — demos are static SPAs; no tokens ever reach the browser because provider sessions are platform-side by design
+- Connector split into API base URL vs public (browser-facing) base URL — compose authorisation journeys now work from a host browser (closes the M4 TECH_DEBT item)
+- CI: CodeQL javascript-typescript re-enabled (first real TS source); build workflow now builds all TS workspaces
+
 ### Added — Milestone 5 (PIS vertical slice), 2026-07-14
 - `platform-application`: framework-free PisService — payment creation with provider payment consent, authorisation callback that submits the payment, status refresh from the provider with domain state-machine enforcement, webhook publication on every status change
 - `platform-webhooks`: WebhookDispatcher — at-least-once delivery, `X-Yapilayer-Signature` HMAC-SHA256 over raw body, 3 attempts with backoff (ADR 0011); subscription model with write-only secrets

@@ -1,0 +1,14 @@
+{
+  "name": "@yapilayer/e2e",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Playwright end-to-end tests driving the AIS and PIS demo apps against a running platform stack",
+  "license": "Apache-2.0",
+  "type": "module",
+  "scripts": {
+    "test": "playwright test"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.49.1"
+  }
+}

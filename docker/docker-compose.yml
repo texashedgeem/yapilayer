@@ -35,6 +35,8 @@ services:
       dockerfile: docker/Dockerfile.platform
     environment:
       YAPILAYER_PROVIDERS_MOCK_BANK_BASE_URL: http://mock-bank:8090
+      # Customer's browser reaches the simulator via the published host port
+      YAPILAYER_PROVIDERS_MOCK_BANK_PUBLIC_BASE_URL: http://localhost:8090
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/yapilayer
       SPRING_DATASOURCE_USERNAME: yapilayer
       SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-yapilayer-dev}

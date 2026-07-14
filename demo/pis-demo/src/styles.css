@@ -1,0 +1,98 @@
+:root {
+  font-family: system-ui, -apple-system, sans-serif;
+  color: #1a1a2e;
+  background: #f7f7fb;
+}
+
+body {
+  margin: 0;
+  padding: 2rem;
+  display: flex;
+  justify-content: center;
+}
+
+main {
+  width: 100%;
+  max-width: 720px;
+}
+
+h1 {
+  font-size: 1.5rem;
+}
+
+.card {
+  background: white;
+  border: 1px solid #e3e3ee;
+  border-radius: 10px;
+  padding: 1.25rem;
+  margin-bottom: 1rem;
+}
+
+button {
+  background: #0d9373;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 0.6rem 1.2rem;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+button.secondary {
+  background: #eef;
+  color: #1a1a2e;
+}
+
+label {
+  display: block;
+  margin: 0.35rem 0;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th,
+td {
+  text-align: left;
+  padding: 0.45rem 0.6rem;
+  border-bottom: 1px solid #eee;
+}
+
+.amount-negative {
+  color: #c0392b;
+}
+
+.amount-positive {
+  color: #0d9373;
+}
+
+.status {
+  display: inline-block;
+  padding: 0.15rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  background: #eef;
+}
+
+.status.AUTHORISED,
+.status.COMPLETED {
+  background: #d9f2e9;
+  color: #0d9373;
+}
+
+.status.REJECTED,
+.status.CANCELLED {
+  background: #fde2dd;
+  color: #c0392b;
+}
+
+.error {
+  color: #c0392b;
+}

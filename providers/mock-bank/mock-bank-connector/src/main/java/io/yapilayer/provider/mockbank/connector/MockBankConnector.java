@@ -24,16 +24,27 @@ public final class MockBankConnector implements BankConnector {
     private final MockBankAisPort aisPort;
     private final MockBankPisPort pisPort;
 
-    /** @param baseUrl the mock-bank-simulator root, e.g. {@code http://localhost:8090} */
+    /** Single-URL convenience for local development where both roles coincide. */
     public MockBankConnector(URI baseUrl) {
+        this(baseUrl, baseUrl);
+    }
+
+    /**
+     * @param apiBaseUrl    where the platform reaches the simulator's API
+     *                      (e.g. {@code http://mock-bank:8090} inside compose)
+     * @param publicBaseUrl where the <em>customer's browser</em> reaches the
+     *                      simulator for the authorisation journey
+     *                      (e.g. {@code http://localhost:8090})
+     */
+    public MockBankConnector(URI apiBaseUrl, URI publicBaseUrl) {
         this.descriptor = new ProviderDescriptor(
                 PROVIDER_ID,
                 "Mock Bank",
                 "GB",
                 Set.of(ProviderCapability.AIS, ProviderCapability.PIS));
-        MockBankHttp http = new MockBankHttp(baseUrl, PROVIDER_ID);
-        this.aisPort = new MockBankAisPort(http);
-        this.pisPort = new MockBankPisPort(http);
+        MockBankHttp http = new MockBankHttp(apiBaseUrl, PROVIDER_ID);
+        this.aisPort = new MockBankAisPort(http, publicBaseUrl);
+        this.pisPort = new MockBankPisPort(http, publicBaseUrl);
     }
 
     @Override

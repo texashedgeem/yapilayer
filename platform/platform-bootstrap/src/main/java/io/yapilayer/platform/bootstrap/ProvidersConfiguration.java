@@ -19,9 +19,10 @@ public class ProvidersConfiguration {
 
     @Bean
     public ProviderRegistry providerRegistry(
-            @Value("${yapilayer.providers.mock-bank.base-url:http://localhost:8090}") URI mockBankBaseUrl) {
+            @Value("${yapilayer.providers.mock-bank.base-url:http://localhost:8090}") URI mockBankBaseUrl,
+            @Value("${yapilayer.providers.mock-bank.public-base-url:${yapilayer.providers.mock-bank.base-url:http://localhost:8090}}") URI mockBankPublicBaseUrl) {
         ProviderRegistry registry = new ProviderRegistry();
-        registry.register(new MockBankConnector(mockBankBaseUrl));
+        registry.register(new MockBankConnector(mockBankBaseUrl, mockBankPublicBaseUrl));
         return registry;
     }
 }

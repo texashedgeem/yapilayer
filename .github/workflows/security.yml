@@ -16,9 +16,7 @@ jobs:
       contents: read
     strategy:
       matrix:
-        # javascript-typescript is added back in Milestone 6 when the first
-        # real TS source lands — CodeQL fails on a repo with only manifests.
-        language: [java-kotlin]
+        language: [java-kotlin, javascript-typescript]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v4
@@ -31,7 +29,8 @@ jobs:
       - uses: github/codeql-action/init@v3
         with:
           languages: ${{ matrix.language }}
-          build-mode: manual
+          # java needs a traced manual build; JS/TS is scanned source-only
+          build-mode: ${{ matrix.language == 'java-kotlin' && 'manual' || 'none' }}
       - name: Build for CodeQL (traced)
         if: matrix.language == 'java-kotlin'
         # --no-daemon so the CodeQL tracer sees the compiler; caches disabled so
