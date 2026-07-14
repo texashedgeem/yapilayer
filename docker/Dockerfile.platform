@@ -8,8 +8,10 @@ RUN ./gradlew --no-daemon :platform:platform-bootstrap:bootJar
 FROM eclipse-temurin:21-jre
 # wget is used by the compose healthcheck
 RUN apt-get update && apt-get install -y --no-install-recommends wget \
-    && rm -rf /var/lib/apt/lists/*
+    && rm -rf /var/lib/apt/lists/* \
+    && useradd --system --uid 1001 app
 WORKDIR /app
 COPY --from=build /workspace/platform/platform-bootstrap/build/libs/*.jar app.jar
+USER app
 EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "app.jar"]
