@@ -26,10 +26,17 @@ jobs:
         with:
           distribution: temurin
           java-version: "21"
+      - uses: gradle/actions/setup-gradle@v4
+        if: matrix.language == 'java-kotlin'
       - uses: github/codeql-action/init@v3
         with:
           languages: ${{ matrix.language }}
-      - uses: github/codeql-action/autobuild@v3
+          build-mode: manual
+      - name: Build for CodeQL (traced)
+        if: matrix.language == 'java-kotlin'
+        # --no-daemon so the CodeQL tracer sees the compiler; caches disabled so
+        # compilation actually re-runs and gets traced
+        run: ./gradlew --no-daemon --no-build-cache --no-configuration-cache clean compileJava
       - uses: github/codeql-action/analyze@v3
 
   dependency-review:
