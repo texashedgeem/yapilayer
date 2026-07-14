@@ -49,5 +49,7 @@ jobs:
             -o sdk/typescript/src \
             --global-property apis,models,supportingFiles \
             --additional-properties=supportsES6=true,typescriptThreePlus=true
-          git diff --exit-code sdk/typescript/src \
+          # Generator metadata (.openapi-generator/) differs between fresh and
+          # in-place generation runs — only real sources matter for freshness.
+          git diff --exit-code -- sdk/typescript/src ':(exclude)sdk/typescript/src/.openapi-generator/**' \
             || (echo "::error::sdk/typescript/src is stale — run scripts/generate-sdk.sh and commit" && exit 1)

@@ -37,6 +37,7 @@ jobs:
       - name: Install workspaces and Playwright
         run: |
           npm ci
+          npm run build -w @yapilayer/sdk
           npx playwright install --with-deps chromium
 
       - name: Contract tests (generated SDK against live stack)
