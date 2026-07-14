@@ -1,16 +1,16 @@
 # Project Status
 
 **Phase:** 1 — reference implementation
-**Current milestone:** 3 — Mock bank connector
+**Current milestone:** 4 — AIS vertical slice
 **Last updated:** 2026-07-14
 
 ## Now
 
-Milestone 3: building the mock bank simulator (standalone fake ASPSP) and the connector implementing provider-sdk against it; first docker-compose bring-up; researching which CMA9 bank/group the mock models (ADR to follow).
+Milestone 4: the platform-side AIS vertical slice — consent API, OAuth callback handling, token storage, accounts/balances/transactions endpoints, Flyway persistence — all against the mock bank.
 
 ## Next
 
-Milestone 4 — AIS vertical slice end-to-end.
+Milestone 5 — PIS vertical slice with webhooks.
 
 ## Notes for maintainer
 
@@ -24,6 +24,7 @@ Ten Dependabot PRs (#1–#10) opened on first activation are superseded: majors 
 | 2026-07-14 | M0 complete | Gradle multi-module skeleton (build green), npm workspaces, ADRs 0001–0008, living docs, contribution framework (commit d83be1e) |
 | 2026-07-14 | M1 complete | CI green on main: build, test, security workflows (commit 067bae7) |
 | 2026-07-14 | M2 complete | Domain aggregates + provider-sdk contract + ADR 0009, 18 unit tests green |
+| 2026-07-14 | M3 complete | Mock bank simulator + connector, end-to-end AIS/PIS acceptance test, compose stack healthy (3 services), ADR 0010 |
 
 ## Blockers
 

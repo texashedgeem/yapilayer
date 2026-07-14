@@ -4,6 +4,17 @@ All notable changes to this project are documented here. Format follows [Keep a 
 
 ## [Unreleased]
 
+### Added — Milestone 3 (Mock bank connector), 2026-07-14
+- `mock-bank-simulator`: standalone fake ASPSP — OAuth 2.0 authorisation-code journey with consent decision page, OB Read/Write-style AIS endpoints (account-access-consents, accounts, balances, paginated transactions) and PIS endpoints (domestic-payment-consents, domestic-payments with auto-advancing status lifecycle), bearer-token enforcement, seeded two-account test persona
+- `mock-bank-connector`: framework-free (JDK HTTP client + Jackson) implementation of provider-sdk against the simulator
+- End-to-end acceptance test: real connector driven through complete AIS and PIS journeys against a live simulator (the D-1 reinterpreted DoD item)
+- Platform registers the connector via ProviderRegistry at startup (configurable simulator URL)
+- First `docker-compose.yml`: postgres + mock-bank + platform, all with healthchecks, verified healthy from one command
+- ADR 0010: mock bank models NatWest Group's OB implementation (research-backed)
+
+### Changed — Milestone 3
+- `PisProviderPort.getPaymentStatus` now takes the ProviderSession — implementation surfaced that the M2 signature forced connectors to cache session state, violating the stateless-connector invariant (ADR 0004)
+
 ### Added — Milestone 2 (Domain model & provider contract), 2026-07-14
 - `platform-domain`: Consent aggregate (UK OB-style lifecycle with expiry), Payment aggregate (explicit status state machine), Account/Balance/Transaction, Money/TenantId/ProviderId value objects — zero framework dependencies
 - `provider-sdk`: BankConnector root with capability discovery, AisProviderPort (consent → authorise → exchange → accounts/balances/paginated transactions), PisProviderPort (payment consent → authorise → submit → status), ProviderRegistry, ProviderException

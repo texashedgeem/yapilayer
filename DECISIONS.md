@@ -15,6 +15,7 @@ Significant decisions, per PROJECT_CONSTITUTION.md §10. Architecture decisions 
 | [0007](adr/0007-spring-data-jpa.md) | Spring Data JPA behind a framework-free domain | Accepted |
 | [0008](adr/0008-bff-auth-for-demo-apps.md) | BFF auth pattern for demo apps | Accepted |
 | [0009](adr/0009-multi-tenancy-seam.md) | Multi-tenancy seam in domain model, enforcement deferred | Accepted |
+| [0010](adr/0010-mock-bank-identity-natwest.md) | Mock bank models NatWest Group's OB implementation | Accepted |
 
 ## Document-Interpretation Decisions
 

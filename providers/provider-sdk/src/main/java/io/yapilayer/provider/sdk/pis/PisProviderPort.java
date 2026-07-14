@@ -23,5 +23,5 @@ public interface PisProviderPort {
     /** Submits the authorised payment for execution; returns the provider's payment reference. */
     String submitPayment(ProviderSession session, String providerPaymentConsentId);
 
-    PaymentStatus getPaymentStatus(String providerPaymentId);
+    PaymentStatus getPaymentStatus(ProviderSession session, String providerPaymentId);
 }

@@ -1,0 +1,9 @@
+.git
+.gradle
+.claude
+**/build
+**/node_modules
+docs
+mintlify
+adr
+*.md
