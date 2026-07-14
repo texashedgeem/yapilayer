@@ -16,7 +16,9 @@ jobs:
       contents: read
     strategy:
       matrix:
-        language: [java-kotlin, javascript-typescript]
+        # javascript-typescript is added back in Milestone 6 when the first
+        # real TS source lands — CodeQL fails on a repo with only manifests.
+        language: [java-kotlin]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v4
