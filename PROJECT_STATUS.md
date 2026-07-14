@@ -1,16 +1,20 @@
 # Project Status
 
 **Phase:** 1 — reference implementation
-**Current milestone:** 1 — CI/CD skeleton
+**Current milestone:** 2 — Domain model & provider-interface contract
 **Last updated:** 2026-07-14
 
 ## Now
 
-Milestone 1: GitHub Actions workflows (build, test, security, release stub) pushed; awaiting first green run.
+Milestone 2: designing `platform-domain` aggregates and the `provider-sdk` plugin contract (the most architecturally consequential milestone).
 
 ## Next
 
-Milestone 2 — Domain model & provider-interface contract.
+Milestone 3 — Mock bank simulator + connector, first docker-compose bring-up.
+
+## Notes for maintainer
+
+Ten Dependabot PRs (#1–#10) opened on first activation are superseded: majors are now excluded by policy (.github/dependabot.yml) and the one patch bump was applied directly (commit 85f8f84). They can be closed at leisure — the agent's permission layer declined mass-closing them autonomously.
 
 ## Milestone history
 
