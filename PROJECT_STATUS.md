@@ -1,16 +1,16 @@
 # Project Status
 
 **Phase:** 1 — reference implementation
-**Current milestone:** 2 — Domain model & provider-interface contract
+**Current milestone:** 3 — Mock bank connector
 **Last updated:** 2026-07-14
 
 ## Now
 
-Milestone 2: designing `platform-domain` aggregates and the `provider-sdk` plugin contract (the most architecturally consequential milestone).
+Milestone 3: building the mock bank simulator (standalone fake ASPSP) and the connector implementing provider-sdk against it; first docker-compose bring-up; researching which CMA9 bank/group the mock models (ADR to follow).
 
 ## Next
 
-Milestone 3 — Mock bank simulator + connector, first docker-compose bring-up.
+Milestone 4 — AIS vertical slice end-to-end.
 
 ## Notes for maintainer
 
@@ -22,7 +22,8 @@ Ten Dependabot PRs (#1–#10) opened on first activation are superseded: majors 
 |------|-----------|---------|
 | 2026-07-14 | Genesis (pre-M0) | Repo created, foundational docs committed, pushed to github.com/texashedgeem/yapilayer |
 | 2026-07-14 | M0 complete | Gradle multi-module skeleton (build green), npm workspaces, ADRs 0001–0008, living docs, contribution framework (commit d83be1e) |
-| 2026-07-14 | M1 started | CI/CD workflows: build, test, security (CodeQL + dependency review + Dependabot), release stub |
+| 2026-07-14 | M1 complete | CI green on main: build, test, security workflows (commit 067bae7) |
+| 2026-07-14 | M2 complete | Domain aggregates + provider-sdk contract + ADR 0009, 18 unit tests green |
 
 ## Blockers
 

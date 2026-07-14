@@ -4,6 +4,12 @@ All notable changes to this project are documented here. Format follows [Keep a 
 
 ## [Unreleased]
 
+### Added — Milestone 2 (Domain model & provider contract), 2026-07-14
+- `platform-domain`: Consent aggregate (UK OB-style lifecycle with expiry), Payment aggregate (explicit status state machine), Account/Balance/Transaction, Money/TenantId/ProviderId value objects — zero framework dependencies
+- `provider-sdk`: BankConnector root with capability discovery, AisProviderPort (consent → authorise → exchange → accounts/balances/paginated transactions), PisProviderPort (payment consent → authorise → submit → status), ProviderRegistry, ProviderException
+- ADR 0009: multi-tenancy seam — every customer-scoped aggregate carries TenantId from day one, isolation enforcement deferred
+- 18 domain/contract unit tests
+
 ### Added — Milestone 1 (CI/CD skeleton), 2026-07-14
 - GitHub Actions workflows: build.yml (JVM + TypeScript), test.yml, security.yml (CodeQL for Java, dependency review on PRs, weekly schedule), release.yml (tag-triggered artifact build, completed fully in Milestone 9)
 - Dependabot: weekly Gradle, npm and GitHub Actions updates, minor/patch only — major upgrades are deliberate recorded decisions
