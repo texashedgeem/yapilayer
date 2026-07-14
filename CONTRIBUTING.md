@@ -27,16 +27,24 @@ npm install         # sets up the TypeScript workspaces
 1. **Read the constitution.** [PROJECT_CONSTITUTION.md](PROJECT_CONSTITUTION.md) governs; [ENGINEERING_STANDARDS.md](ENGINEERING_STANDARDS.md) defines the bar.
 2. **Provider logic stays out of the core.** Bank-specific code belongs in a connector module implementing `provider-sdk` interfaces — PRs that leak provider specifics into `platform/*` will be asked to restructure.
 3. **`platform-domain` stays framework-free.** No Spring (or any framework) dependencies there.
-4. **Definition of done** (ENGINEERING_STANDARDS §31): code + tests + documentation + API docs updated + CI green.
-5. **Significant decisions need an ADR** — copy the template style in `adr/` and reference it from DECISIONS.md.
-6. **Never commit secrets** — see [SECURITY.md](SECURITY.md).
+4. **API changes start in the spec.** Edit `openapi/yapilayer-api.yaml` first, run `./scripts/generate-sdk.sh`, and commit the regenerated SDKs — CI fails on drift (ADR 0005/0012).
+5. **Formatting is enforced.** Run `./gradlew spotlessApply` before committing; the build fails on violations.
+6. **Definition of done** (ENGINEERING_STANDARDS §31): code + tests + documentation + API docs updated + CI green.
+7. **Significant decisions need an ADR** — copy the template style in `adr/` and reference it from DECISIONS.md.
+8. **Never commit secrets** — see [SECURITY.md](SECURITY.md).
+
+## Test layers
+
+- Module unit tests live beside the code (`./gradlew test`)
+- Cross-stack integration tests run on Testcontainers as part of `./gradlew build`
+- With the compose stack up: `npm test -w @yapilayer/contract-tests` (generated SDK vs live API) and `npx playwright test` in `tests/e2e` (browser journeys)
 
 ## Workflow
 
 1. Fork and create a feature branch.
-2. Make your change with tests and docs.
-3. Ensure `./gradlew build` passes locally.
-4. Open a PR using the template. CI must pass before review.
+2. Make your change with tests and docs (the docs site source is `docs/`).
+3. Ensure `./gradlew build` passes locally (includes formatting and unit/integration tests).
+4. Open a PR using the template. CI must pass before review: build, tests, Spotless, spec lint + SDK freshness, CodeQL, Trivy, dependency review.
 
 ## Adding a bank connector
 

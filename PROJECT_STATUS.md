@@ -1,43 +1,49 @@
 # Project Status
 
-**Phase:** 1 — reference implementation
-**Current milestone:** 11 — Contribution framework verification
+**Phase:** 1 — reference implementation: **COMPLETE** ✅
+**Verified:** 2026-07-14, `scripts/verify-phase1-dod.sh` — 41/41 PRD §19 checks pass
 **Last updated:** 2026-07-14
 
-## Now
+## What exists
 
-Milestone 11: revisiting CONTRIBUTING/CODE_OF_CONDUCT/SECURITY/templates against the real module structure, then Milestone 12's Definition-of-Done pass.
+A working open-source Open Banking reference implementation:
 
-## Next
+- `docker compose up -d --build` brings up five healthy services (postgres, mock bank, platform, two demo apps) with no local toolchain
+- Complete AIS journeys (consent → authorise → accounts/balances/paginated transactions) and PIS journeys (payment → authorise → status lifecycle → HMAC-signed webhooks) — proven by integration tests on Testcontainers, SDK contract tests, and Playwright browser e2e, all green in CI
+- Provider plugin framework with a NatWest-flavoured mock bank as the reference connector
+- Generated TypeScript and Java SDKs, spec-first with CI drift protection
+- 13-page documentation site, 12 ADRs, complete living-docs set
+- CI: build/format, tests, CodeQL (Java+TS), Trivy, dependency review, full-stack e2e, release automation
 
-Milestone 12 — Phase 1 DoD verification (`scripts/verify-phase1-dod.sh`).
+## Phase 2 candidates (need project-owner decisions)
 
-## Notes for maintainer
+| Item | What it needs from Simon |
+|------|--------------------------|
+| First real bank connector (NatWest per ADR 0010) | Bank of APIs developer-portal registration (credentials) |
+| SDK publishing (npm / Maven Central) | Registry accounts + tokens |
+| Docs site hosting | Mintlify account/tier decision |
+| Platform API authentication + multi-tenancy enforcement | Prioritisation |
+| FAPI conformance in platform-security | Follows real connector |
 
-- Mintlify hosting: the docs site content is complete in `docs/` and previews locally (`npx mint dev`); publishing needs a Mintlify account/hosting decision when wanted (see RISKS.md).
-- Ten superseded Dependabot PRs (#1–#10) remain open — close at leisure.
+## Housekeeping
 
-## Notes for maintainer
-
-Ten Dependabot PRs (#1–#10) opened on first activation are superseded: majors are now excluded by policy (.github/dependabot.yml) and the one patch bump was applied directly (commit 85f8f84). They can be closed at leisure — the agent's permission layer declined mass-closing them autonomously.
+- Ten superseded Dependabot PRs (#1–#10) remain open — close at leisure
+- A `v0.1.0` tag would exercise the release pipeline end-to-end when desired
 
 ## Milestone history
 
 | Date | Milestone | Outcome |
 |------|-----------|---------|
-| 2026-07-14 | Genesis (pre-M0) | Repo created, foundational docs committed, pushed to github.com/texashedgeem/yapilayer |
-| 2026-07-14 | M0 complete | Gradle multi-module skeleton (build green), npm workspaces, ADRs 0001–0008, living docs, contribution framework (commit d83be1e) |
-| 2026-07-14 | M1 complete | CI green on main: build, test, security workflows (commit 067bae7) |
-| 2026-07-14 | M2 complete | Domain aggregates + provider-sdk contract + ADR 0009, 18 unit tests green |
-| 2026-07-14 | M3 complete | Mock bank simulator + connector, end-to-end AIS/PIS acceptance test, compose stack healthy (3 services), ADR 0010 |
-| 2026-07-14 | M4 complete | AIS vertical slice: consent API → callback → accounts/balances/transactions, Flyway persistence, integration test on Testcontainers + simulator, compose re-verified |
-| 2026-07-14 | M5 complete | PIS vertical slice: payments API → authorise → submit → status lifecycle, signed webhooks with retry (ADR 0011), full journey test incl. HMAC verification |
-| 2026-07-14 | M6 complete | ais-demo + pis-demo SPAs (platform-as-BFF per ADR 0008 resolution), 3 Playwright e2e specs green against the compose stack, public/internal base-url split |
-| 2026-07-14 | M7 complete | TS + Java SDKs generated (ADR 0012), contract tests via generated SDK green, spec lints clean |
-| 2026-07-14 | M8 complete | Five-service compose stack healthy from one command, demos nginx-served, e2e green against containers, .env.example + quickstart docs |
-| 2026-07-14 | M9 complete | Spotless enforced, SDK-freshness + spec-lint CI jobs, Trivy scanning (caught+fixed jackson ACE CVE, non-root containers), release.yml completed, e2e workflow green in Actions |
-| 2026-07-14 | M10 complete | Full Mintlify docs site: 13 pages, 4 groups, link-validated |
-
-## Blockers
-
-None.
+| 2026-07-14 | Genesis (pre-M0) | Repo created, foundational docs, pushed to github.com/texashedgeem/yapilayer |
+| 2026-07-14 | M0 | Gradle multi-module skeleton, npm workspaces, ADRs 0001–0008, living docs |
+| 2026-07-14 | M1 | CI skeleton green on main |
+| 2026-07-14 | M2 | Domain aggregates + provider-sdk contract, 18 unit tests |
+| 2026-07-14 | M3 | Mock bank simulator + connector, e2e acceptance test, first compose bring-up, ADR 0010 |
+| 2026-07-14 | M4 | AIS vertical slice with Testcontainers journey test |
+| 2026-07-14 | M5 | PIS vertical slice with signed webhooks (ADR 0011) |
+| 2026-07-14 | M6 | Demo apps + Playwright e2e, ADR 0008 resolved |
+| 2026-07-14 | M7 | TS + Java SDKs, contract tests (ADR 0012) |
+| 2026-07-14 | M8 | Five-service single-command compose stack |
+| 2026-07-14 | M9 | CI completion — Trivy caught+fixed a real jackson ACE CVE; e2e in Actions |
+| 2026-07-14 | M10 | 13-page documentation site, link-validated |
+| 2026-07-14 | M11+M12 | Contribution docs verified; **DoD 41/41 — Phase 1 complete** |

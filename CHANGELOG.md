@@ -4,6 +4,10 @@ All notable changes to this project are documented here. Format follows [Keep a 
 
 ## [Unreleased]
 
+### Added — Milestones 11 & 12 (Contribution verification + DoD pass), 2026-07-14
+- CONTRIBUTING.md and PR template updated to the real workflow: spec-first API changes, Spotless, all four test layers, full CI gate list
+- `scripts/verify-phase1-dod.sh`: scripted verification of every PRD §19 item — **41/41 checks pass; Phase 1 Definition of Done satisfied** (item 6 per the recorded D-1 reinterpretation)
+
 ### Added — Milestone 10 (Documentation site), 2026-07-14
 - Full Mintlify documentation (13 pages, 4 nav groups): introduction, installation, API quickstart, authentication model, AIS guide, PIS guide with webhook verification code, "build a provider" guide, SDK usage (TS + Java), architecture, security posture with the explicit Phase 1 boundary, deployment/configuration reference, contributing, troubleshooting
 - Validated with the Mintlify CLI (no broken links); content grounded in the implemented `/api/v1` surface
