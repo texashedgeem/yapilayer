@@ -4,6 +4,10 @@ All notable changes to this project are documented here. Format follows [Keep a 
 
 ## [Unreleased]
 
+### Added — Milestone 1 (CI/CD skeleton), 2026-07-14
+- GitHub Actions workflows: build.yml (JVM + TypeScript), test.yml, security.yml (CodeQL for Java/TS, dependency review on PRs, weekly schedule), release.yml (tag-triggered artifact build, completed fully in Milestone 9)
+- Dependabot: weekly Gradle, npm and GitHub Actions update PRs
+
 ### Added — Milestone 0 (Genesis & scaffolding), 2026-07-14
 - Gradle multi-module skeleton (Kotlin DSL, version catalog, wrapper 8.14.3): 8 platform modules, provider-sdk, mock-bank simulator + connector; first `./gradlew build` green on Java 21
 - npm workspaces for demo apps and TypeScript SDK
