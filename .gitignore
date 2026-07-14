@@ -39,6 +39,9 @@ logs/
 # Docker
 .docker/
 
+# Local agent/harness state
+.claude/
+
 # Misc
 *.tmp
 *.bak
