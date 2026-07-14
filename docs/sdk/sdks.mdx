@@ -1,0 +1,55 @@
+---
+title: SDKs
+description: Generated TypeScript and Java clients
+---
+
+Both SDKs are generated from `openapi/yapilayer-api.yaml` — the single source of truth ([ADR 0012](https://github.com/texashedgeem/yapilayer/blob/main/adr/0012-sdk-generation-tooling.md)). CI regenerates and diffs the TypeScript SDK on every push, so they cannot drift from the platform. Registry publishing (npm/Maven Central) is pending; today both are consumed from the repository.
+
+## TypeScript — `@yapilayer/sdk`
+
+Zero runtime dependencies (native `fetch`). Inside the monorepo it's a workspace dependency; externally, copy `sdk/typescript` or vendor the repo.
+
+```typescript
+import { Configuration, ConsentsApi, AccountsApi } from "@yapilayer/sdk";
+
+const config = new Configuration({ basePath: "http://localhost:8080/api/v1" });
+const consents = new ConsentsApi(config);
+
+const consent = await consents.createConsent({
+  createConsentRequest: {
+    providerId: "mock-bank",
+    permissions: ["READ_ACCOUNTS", "READ_BALANCES"],
+    redirectUri: "https://your-app.example/connected",
+  },
+});
+// send the customer to consent.authorisationUrl, then after the redirect:
+
+const accounts = await new AccountsApi(config).listAccounts({
+  consentId: consent.consentId,
+});
+```
+
+The repository's contract tests (`tests/contract`) are a complete worked example of every API through this SDK.
+
+## Java — `io.yapilayer:yapilayer-sdk-java`
+
+JDK-native HttpClient, standalone Maven/Gradle project in `sdk/java` (build with its own wrapper).
+
+```java
+ApiClient client = new ApiClient();
+client.updateBaseUri("http://localhost:8080/api/v1");
+
+ConsentsApi consents = new ConsentsApi(client);
+Consent consent = consents.createConsent(new CreateConsentRequest()
+        .providerId("mock-bank")
+        .permissions(List.of(PermissionsEnum.READ_ACCOUNTS))
+        .redirectUri(URI.create("https://your-app.example/connected")));
+```
+
+## Regenerating
+
+```bash
+./scripts/generate-sdk.sh   # lints the spec, regenerates both SDKs, builds TS
+```
+
+Generated code is committed and never hand-edited. Python, Go, C# and PHP generators are the Phase 2+ path — same spec, one more generator invocation each.

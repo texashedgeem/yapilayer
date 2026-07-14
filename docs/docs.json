@@ -12,7 +12,37 @@
     "groups": [
       {
         "group": "Getting Started",
-        "pages": ["index"]
+        "pages": [
+          "index",
+          "getting-started/introduction",
+          "installation/installation",
+          "quickstart/quickstart"
+        ]
+      },
+      {
+        "group": "Guides",
+        "pages": [
+          "authentication/authentication",
+          "ais/ais",
+          "pis/pis",
+          "providers/building-a-provider",
+          "sdk/sdks"
+        ]
+      },
+      {
+        "group": "Platform",
+        "pages": [
+          "architecture/architecture",
+          "security/security",
+          "deployment/deployment"
+        ]
+      },
+      {
+        "group": "Community",
+        "pages": [
+          "contributing/contributing",
+          "troubleshooting/troubleshooting"
+        ]
       }
     ]
   },

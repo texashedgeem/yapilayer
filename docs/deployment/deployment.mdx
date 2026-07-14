@@ -1,0 +1,41 @@
+---
+title: Deployment
+description: Compose today, configuration, and the path beyond
+---
+
+## Docker Compose (the Phase 1 target)
+
+```bash
+cd docker && docker compose up -d --build
+```
+
+Five services with healthchecks: `postgres`, `mock-bank`, `platform`, `ais-demo`, `pis-demo`. All images build multi-stage in-container (no host toolchain) and run as non-root users.
+
+## Configuration
+
+Everything is environment variables; defaults suit local development.
+
+| Variable | Default | Purpose |
+|----------|---------|---------|
+| `SPRING_DATASOURCE_URL` | `jdbc:postgresql://localhost:5432/yapilayer` | Platform database |
+| `SPRING_DATASOURCE_USERNAME` / `_PASSWORD` | `yapilayer` / `yapilayer-dev` | DB credentials |
+| `YAPILAYER_CALLBACK_URL` | `http://localhost:8080/api/v1/callback` | Where banks redirect after consent authorisation |
+| `YAPILAYER_PAYMENTS_CALLBACK_URL` | `…/api/v1/payments/callback` | Payment journey callback |
+| `YAPILAYER_PROVIDERS_MOCK_BANK_BASE_URL` | `http://localhost:8090` | Simulator, as the **platform** reaches it |
+| `YAPILAYER_PROVIDERS_MOCK_BANK_PUBLIC_BASE_URL` | (= base-url) | Simulator, as the **customer's browser** reaches it |
+
+The base/public split matters whenever the platform and the customer resolve the bank differently (inside compose: `http://mock-bank:8090` vs `http://localhost:8090`).
+
+## Database
+
+Flyway migrates automatically at startup (`V1__init.sql`, `V2__payments_webhooks.sql`); Hibernate runs in `ddl-auto: validate`. Postgres data persists in the `postgres-data` volume.
+
+## Operations
+
+- Health: `/actuator/health` on platform (8080) and simulator (8090); nginx serves demo healthchecks
+- Metrics: `/actuator/metrics`; graceful shutdown enabled on both JVM services
+- Logs: `docker compose logs -f platform`
+
+## Beyond Compose
+
+The services are stateless (all state in PostgreSQL) with externalised config, so Kubernetes or any container platform is a packaging exercise, not a rework — planned Phase 3 with the observability stack (OpenTelemetry/Prometheus/Grafana). Cloud-neutrality is validated only against Compose so far; `RISKS.md` tracks this honestly.

@@ -1,0 +1,47 @@
+---
+title: Account Information Services
+description: Consents, accounts, balances and transactions
+---
+
+## Consent lifecycle
+
+```
+AWAITING_AUTHORISATION ──approve──▶ AUTHORISED ──revoke──▶ REVOKED
+        │                              │
+        └──deny──▶ REJECTED            └──(time)──▶ EXPIRED
+```
+
+Consents carry a permission set (`READ_ACCOUNTS`, `READ_BALANCES`, `READ_TRANSACTIONS`, `READ_IDENTITY`) and a 90-day default validity. Data access requires status `AUTHORISED` and an unexpired consent — anything else returns `409 consent_not_authorised`.
+
+## Endpoints
+
+| Method & path | Purpose |
+|---------------|---------|
+| `POST /api/v1/consents` | Create consent, get `authorisationUrl` |
+| `GET /api/v1/consents/{consentId}` | Consent status |
+| `GET /api/v1/consents/{consentId}/accounts` | Accounts available under the consent |
+| `GET .../accounts/{accountId}/balances` | `CURRENT` and `AVAILABLE` balances |
+| `GET .../accounts/{accountId}/transactions` | Paginated transaction history |
+
+## Transactions and pagination
+
+```bash
+GET /api/v1/consents/{id}/accounts/acc-001/transactions?pageSize=5
+```
+
+```json
+{
+  "transactions": [
+    {"transactionId": "txn-101", "amount": "-32.40", "currency": "GBP",
+     "status": "BOOKED", "bookingDate": "2026-07-12",
+     "reference": "Card purchase", "merchantName": "Sainsbury's"}
+  ],
+  "nextPageKey": "1"
+}
+```
+
+Amounts are signed strings (negative = debit). `nextPageKey` is opaque — pass it back as `pageKey`; a null key means the last page.
+
+## Error model
+
+All errors share one shape: `{"error": "<code>", "message": "..."}` — `not_found` (404), `consent_not_authorised` (409), `invalid_request` (400), `provider_error` (502, provider details wrapped, never leaked).

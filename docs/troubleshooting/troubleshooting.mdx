@@ -1,0 +1,34 @@
+---
+title: Troubleshooting
+description: Common issues and how to diagnose them
+---
+
+## Stack won't start
+
+**A service is `unhealthy`** — `docker compose ps` then `docker compose logs <service>`. The platform depends on postgres and mock-bank being healthy first; first builds take several minutes (in-container Gradle/npm).
+
+**Port already in use** — the stack claims 5173, 5174, 5432, 8080, 8090. Stop local dev servers (Vite, Postgres) or edit the port mappings in `docker-compose.yml`.
+
+## Authorisation journeys
+
+**The `authorisationUrl` doesn't load in my browser** — the platform builds that URL from `YAPILAYER_PROVIDERS_MOCK_BANK_PUBLIC_BASE_URL`. It must be resolvable by the *browser* (in compose: `http://localhost:8090`), while `…_BASE_URL` must be resolvable by the *platform* (in compose: `http://mock-bank:8090`).
+
+**Callback returns 404 `not_found`** — the `state` didn't match a pending journey: the platform was restarted mid-journey, or the consent was created against a different platform instance than the callback hit.
+
+**Data access returns 409 `consent_not_authorised`** — the consent is not `AUTHORISED` (customer denied, consent expired, or the callback never completed). Check `GET /api/v1/consents/{id}`.
+
+## Webhooks
+
+**No deliveries arriving** — the platform must be able to reach your URL (from inside compose, `localhost` is the *container*, not your machine — use `host.docker.internal` on Docker Desktop). Deliveries retry 3× then drop, logged at ERROR in `docker compose logs platform`; recover by polling the payment.
+
+**Signature verification fails** — compute the HMAC over the **raw request body** exactly as received, not a re-serialised parse of it.
+
+## Builds and tests
+
+**`./gradlew build` fails on formatting** — run `./gradlew spotlessApply`.
+
+**Integration tests fail with "Could not find a valid Docker environment"** — Testcontainers needs the Docker daemon running.
+
+**CI says the SDK is stale** — run `./scripts/generate-sdk.sh` and commit the regenerated `sdk/` output.
+
+Still stuck? Open an issue with the bug template — include `docker compose ps` output and relevant logs.

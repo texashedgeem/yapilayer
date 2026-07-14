@@ -1,0 +1,67 @@
+---
+title: Quickstart
+description: First consent and first payment through the API
+---
+
+With the stack running (`docker compose up -d --build` in `docker/`), this walks the raw API. The [SDKs](/sdk/sdks) wrap all of it.
+
+## 1. Discover providers
+
+```bash
+curl http://localhost:8080/api/v1/providers
+```
+
+```json
+[{"id":"mock-bank","name":"Mock Bank","country":"GB","capabilities":["AIS","PIS"]}]
+```
+
+## 2. Create an AIS consent
+
+```bash
+curl -X POST http://localhost:8080/api/v1/consents \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "providerId": "mock-bank",
+    "permissions": ["READ_ACCOUNTS", "READ_BALANCES", "READ_TRANSACTIONS"],
+    "redirectUri": "http://localhost:9999/done"
+  }'
+```
+
+The response includes `consentId` (status `AWAITING_AUTHORISATION`) and an `authorisationUrl`.
+
+## 3. Authorise as the customer
+
+Open the `authorisationUrl` in a browser and click **Approve** on the mock bank's consent page. The bank redirects through the platform callback, which completes the exchange and forwards to your `redirectUri` with `?consentId=...&status=AUTHORISED`.
+
+## 4. Read account data
+
+```bash
+CONSENT=<consentId>
+curl http://localhost:8080/api/v1/consents/$CONSENT/accounts
+curl http://localhost:8080/api/v1/consents/$CONSENT/accounts/acc-001/balances
+curl "http://localhost:8080/api/v1/consents/$CONSENT/accounts/acc-001/transactions?pageSize=5"
+```
+
+Transactions paginate with an opaque `nextPageKey`; pass it back as `pageKey` for the next page.
+
+## 5. Make a payment
+
+```bash
+curl -X POST http://localhost:8080/api/v1/payments \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "providerId": "mock-bank",
+    "amount": "25.00", "currency": "GBP",
+    "creditor": {"name": "Acme Ltd", "scheme": "UK.OBIE.SortCodeAccountNumber", "identification": "20000012345678"},
+    "reference": "INV-001",
+    "redirectUri": "http://localhost:9999/paid"
+  }'
+```
+
+Approve at the returned `authorisationUrl` (the callback also **submits** the payment), then poll:
+
+```bash
+curl http://localhost:8080/api/v1/payments/<paymentId>
+```
+
+Status advances `PENDING → AUTHORISED → COMPLETED`. Register a [webhook](/pis/pis#webhooks) to be pushed each change instead of polling.

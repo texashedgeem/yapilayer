@@ -1,0 +1,33 @@
+---
+title: Contributing
+description: How to contribute code, connectors and documentation
+---
+
+Yapilayer aims to be community-owned. The full guide is [`CONTRIBUTING.md`](https://github.com/texashedgeem/yapilayer/blob/main/CONTRIBUTING.md); the essentials:
+
+## Setup
+
+```bash
+git clone https://github.com/texashedgeem/yapilayer.git
+cd yapilayer
+./scripts/setup.sh
+```
+
+## Ground rules
+
+1. **Provider logic stays out of the core** — bank-specific code belongs in a connector implementing `provider-sdk`.
+2. **`platform-domain` stays framework-free.**
+3. **Definition of done**: code + tests + documentation + CI green. Formatting is enforced (`./gradlew spotlessApply` before committing).
+4. **Significant decisions need an ADR** (`adr/`, indexed in `DECISIONS.md`).
+5. **API changes start in the spec** — edit `openapi/yapilayer-api.yaml`, run `scripts/generate-sdk.sh`, commit the regenerated SDKs (CI fails on drift).
+6. **Never commit secrets.**
+
+## What contributions are most valuable
+
+- **Bank connectors** — the [provider guide](/providers/building-a-provider) is the on-ramp; a real CMA9 sandbox connector is the headline Phase 2 item
+- **SDK generators** for more languages (Python, Go, C#, PHP)
+- Documentation, examples, and issue reports via the templates
+
+## Workflow
+
+Fork → feature branch → `./gradlew build` green locally → PR using the template. Every PR runs build, tests, formatting, CodeQL, Trivy and dependency review.

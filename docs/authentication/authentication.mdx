@@ -1,0 +1,27 @@
+---
+title: Authentication
+description: How authorisation journeys work, and where tokens live
+---
+
+## The customer authorisation journey
+
+Every data-access or payment journey is customer-authorised at the bank, OAuth 2.0 authorisation-code style:
+
+1. `POST /api/v1/consents` (or `/payments`) — the platform creates the provider-side resource and returns the bank's `authorisationUrl`, carrying an anti-CSRF `state` the platform generated and stored.
+2. The customer's browser visits the URL, authenticates at the bank, approves.
+3. The bank redirects to the platform callback (`/api/v1/callback` for consents, `/api/v1/payments/callback` for payments — deliberately separate) with `code` and the echoed `state`.
+4. The platform validates the state, exchanges the code for an access token with the bank, **stores the session server-side**, marks the consent/payment authorised, and redirects the customer to your `redirectUri` with the outcome.
+
+Denials arrive the same way (`error=access_denied`) and mark the resource `REJECTED`.
+
+## Where tokens live
+
+Nowhere near the browser. Provider access tokens are stored by the platform (PostgreSQL) and used only inside provider connectors. Your frontend and the customer's browser handle nothing but consent/payment identifiers — references, not bearer credentials. This is the platform-as-BFF resolution recorded in [ADR 0008](https://github.com/texashedgeem/yapilayer/blob/main/adr/0008-bff-auth-for-demo-apps.md).
+
+## Platform API authentication
+
+The `/api/v1` surface is **unauthenticated in Phase 1** — the platform is a single-operator reference implementation running against synthetic data. Per-client API credentials, and the multi-tenancy enforcement they enable, are Phase 2 scope (tracked in `KNOWN_GAPS.md`; the data model already carries tenant identity per ADR 0009).
+
+## FAPI
+
+UK Open Banking production access requires the FAPI profile (mutual TLS or `private_key_jwt`, signed request objects, eIDAS certificates). Phase 1 implements standard OAuth 2.0 flows against the mock bank; FAPI-grade client authentication lands with the first real bank connector. The boundary is documented precisely in [Security](/security/security).

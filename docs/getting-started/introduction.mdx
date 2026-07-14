@@ -1,0 +1,37 @@
+---
+title: Introduction
+description: Yapilayer concepts in five minutes
+---
+
+## The pieces
+
+| Component | What it does |
+|-----------|--------------|
+| **Platform** | Spring Boot service exposing the `/api/v1` REST API: consents, accounts, payments, webhooks, provider discovery |
+| **Provider connectors** | Plugins that implement bank connectivity. Phase 1 ships `mock-bank`; real banks are additional modules |
+| **Mock bank simulator** | A standalone fake ASPSP with its own OAuth journey and Open Banking-style API — realistic connectivity with no registration |
+| **Demo apps** | React SPAs demonstrating the complete AIS and PIS journeys |
+| **SDKs** | TypeScript (`@yapilayer/sdk`) and Java, generated from the OpenAPI spec |
+
+## The core idea: provider neutrality
+
+Your application talks to Yapilayer's stable API. Yapilayer talks to banks through the provider contract (`BankConnector`, `AisProviderPort`, `PisProviderPort`). Bank-specific logic lives only inside connectors — adding a bank never changes the core, and your application code never changes at all.
+
+```
+Your app  →  Yapilayer /api/v1  →  Provider contract  →  Bank connector  →  Bank
+```
+
+Connectors declare **capabilities** (`AIS`, `PIS`; `COP`/`VRP` reserved), discoverable at `GET /api/v1/providers`.
+
+## The journeys
+
+Both AIS and PIS follow the same shape, mirroring UK Open Banking:
+
+1. Your app asks the platform to create a **consent** (or payment) — the platform returns an `authorisationUrl`.
+2. You send the customer's browser there; the customer authenticates and approves **at the bank**.
+3. The bank redirects to the platform's callback; the platform exchanges the code, stores the session server-side, and redirects the customer on to *your* `redirectUri` with the outcome.
+4. Your app uses the consent/payment id for data access or status tracking. No tokens ever pass through the browser or your frontend.
+
+## What Phase 1 deliberately defers
+
+Real bank connectivity (the mock stands in — [ADR 0003](https://github.com/texashedgeem/yapilayer/blob/main/adr/0003-mock-bank-first-strategy.md)), FAPI-grade client authentication, platform API authentication and multi-tenancy enforcement, and durable webhook queues. Every deferral is recorded in the repository's `KNOWN_GAPS.md` and `TECH_DEBT.md` — nothing is silently absent.

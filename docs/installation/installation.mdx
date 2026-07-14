@@ -1,0 +1,57 @@
+---
+title: Installation
+description: Run the full stack with Docker, or set up local development
+---
+
+## Docker (recommended)
+
+Only Docker with Compose is required — images build in-container.
+
+```bash
+git clone https://github.com/texashedgeem/yapilayer.git
+cd yapilayer/docker
+docker compose up -d --build
+```
+
+| Service | URL |
+|---------|-----|
+| AIS demo | http://localhost:5173 |
+| PIS demo | http://localhost:5174 |
+| Platform API | http://localhost:8080/api/v1 |
+| Mock bank | http://localhost:8090 |
+| PostgreSQL | localhost:5432 |
+
+Configuration overrides: copy `docker/.env.example` to `docker/.env`. All platform settings are environment variables (`SPRING_DATASOURCE_*`, `YAPILAYER_*` — see `docker-compose.yml`).
+
+## Local development
+
+Prerequisites: **Java 17+** (the build auto-provisions a JDK 21 toolchain), **Node 20+**, **Docker**.
+
+```bash
+./scripts/setup.sh    # verifies prerequisites, builds JVM modules, installs TS workspaces
+```
+
+Run the platform pieces individually:
+
+```bash
+# Terminal 1 — database
+cd docker && docker compose up postgres
+
+# Terminal 2 — mock bank simulator (port 8090)
+./gradlew :providers:mock-bank:mock-bank-simulator:bootRun
+
+# Terminal 3 — platform (port 8080)
+./gradlew :platform:platform-bootstrap:bootRun
+
+# Terminal 4 — a demo app (Vite dev server, proxies /api to :8080)
+npm run dev -w @yapilayer/ais-demo
+```
+
+## Verifying an installation
+
+```bash
+curl http://localhost:8080/actuator/health          # {"status":"UP"}
+curl http://localhost:8080/api/v1/providers          # [{"id":"mock-bank",...}]
+```
+
+The test suites are the deepest verification: `./gradlew build` (unit + integration on Testcontainers), and with the stack running, `npm test -w @yapilayer/contract-tests` and `npx playwright test` in `tests/e2e`.

@@ -1,0 +1,29 @@
+---
+title: Security
+description: Posture, practices, and the explicit Phase 1 boundary
+---
+
+Yapilayer's reference standards are OWASP ASVS, the OWASP API Security Top 10 and the NIST CSF. Reports: use GitHub Security Advisories on the repository (never public issues).
+
+## Practices in place
+
+- OAuth 2.0 authorisation-code journeys with anti-CSRF state validation on every callback
+- No tokens in browsers — provider sessions live server-side only ([Authentication](/authentication/authentication))
+- Webhook deliveries signed with HMAC-SHA256; subscription secrets are write-only
+- No secrets in source or git; configuration via environment variables
+- Containers run as non-root users; images scanned (Trivy) alongside CodeQL and dependency review in CI
+- Domain state machines make illegal consent/payment transitions unrepresentable
+
+## The explicit Phase 1 boundary
+
+Phase 1 runs against a **mock bank with synthetic data**. Consequently, and recorded rather than silent:
+
+| Deferred | Why | When |
+|----------|-----|------|
+| FAPI profile (MTLS/`private_key_jwt`, signed request objects, eIDAS certs) | Meaningless against a mock; needs real TPP registration | Phase 2, first real connector |
+| Platform API authentication | Single-operator reference deployment | Phase 2 |
+| Token encryption at rest | Dev-grade database, synthetic tokens | Before real-bank data |
+| Rate limiting | Never specified in foundational docs; gap tracked | Phase 2+ |
+| GDPR/data-retention policy | Synthetic data only | Required before any real customer data |
+
+Authoritative list: `SECURITY.md` and `KNOWN_GAPS.md` in the repository root.

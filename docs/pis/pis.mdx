@@ -1,0 +1,62 @@
+---
+title: Payment Initiation Services
+description: Payments, the status lifecycle, and signed webhooks
+---
+
+## Payment lifecycle
+
+```
+PENDING ──authorise──▶ AUTHORISED ──settle──▶ COMPLETED
+   │                       │
+   ├──deny──▶ REJECTED     ├──▶ REJECTED
+   └──▶ CANCELLED          └──▶ CANCELLED
+```
+
+Transitions are enforced by the domain — the platform will never report an illegal move (e.g. `COMPLETED` without `AUTHORISED`). The customer authorising at the bank both authorises **and submits** the payment; `GET /api/v1/payments/{id}` refreshes in-flight status from the provider.
+
+## Endpoints
+
+| Method & path | Purpose |
+|---------------|---------|
+| `POST /api/v1/payments` | Create a single domestic payment, get `authorisationUrl` |
+| `GET /api/v1/payments/{paymentId}` | Status (live-refreshed while in flight) |
+| `POST /api/v1/webhooks` | Register a webhook endpoint |
+| `GET /api/v1/webhooks` | List subscriptions (secrets never returned) |
+
+## Webhooks
+
+Register an endpoint and a secret (min 16 chars):
+
+```bash
+curl -X POST http://localhost:8080/api/v1/webhooks \
+  -H 'Content-Type: application/json' \
+  -d '{"url": "https://your-app.example/hooks/yapilayer", "secret": "a-long-random-secret"}'
+```
+
+Every payment status change delivers:
+
+```json
+{
+  "type": "payment.status.changed",
+  "occurredAt": "2026-07-14T21:00:00Z",
+  "data": {"paymentId": "…", "providerId": "mock-bank", "status": "COMPLETED",
+           "amount": "25.00", "currency": "GBP", "reference": "INV-001"}
+}
+```
+
+### Verifying deliveries
+
+Each request carries `X-Yapilayer-Signature: sha256=<hex>` — HMAC-SHA256 over the **raw request body** with your secret:
+
+```typescript
+import { createHmac, timingSafeEqual } from "node:crypto";
+
+function verify(rawBody: string, header: string, secret: string): boolean {
+  const expected = "sha256=" + createHmac("sha256", secret).update(rawBody).digest("hex");
+  return timingSafeEqual(Buffer.from(header), Buffer.from(expected));
+}
+```
+
+### Delivery semantics
+
+At-least-once: treat deliveries idempotently (the event carries the full status, so replays are harmless). Failed deliveries retry 3 times with backoff; queued retries do not survive a platform restart in Phase 1 ([ADR 0011](https://github.com/texashedgeem/yapilayer/blob/main/adr/0011-webhook-delivery.md)) — recover missed events by polling the payment.

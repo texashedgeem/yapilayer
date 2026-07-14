@@ -4,6 +4,10 @@ All notable changes to this project are documented here. Format follows [Keep a 
 
 ## [Unreleased]
 
+### Added — Milestone 10 (Documentation site), 2026-07-14
+- Full Mintlify documentation (13 pages, 4 nav groups): introduction, installation, API quickstart, authentication model, AIS guide, PIS guide with webhook verification code, "build a provider" guide, SDK usage (TS + Java), architecture, security posture with the explicit Phase 1 boundary, deployment/configuration reference, contributing, troubleshooting
+- Validated with the Mintlify CLI (no broken links); content grounded in the implemented `/api/v1` surface
+
 ### Added — Milestone 9 (CI/CD completion), 2026-07-14
 - Spotless (google-java-format AOSP + ktlint for build scripts) enforced in every build; one-time repo-wide reformat applied
 - build workflow: OpenAPI lint job + SDK-freshness check (regenerates the TS SDK and fails on drift)

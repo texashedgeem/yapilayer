@@ -1,0 +1,39 @@
+---
+title: Architecture
+description: Layered modules, the plugin framework, and enforced invariants
+---
+
+## Layered, one Gradle module per layer
+
+Dependency direction is enforced at **compile time** — the build fails if a layer reaches where it shouldn't ([ADR 0001](https://github.com/texashedgeem/yapilayer/blob/main/adr/0001-monorepo-and-module-boundaries.md)).
+
+| Module | Responsibility |
+|--------|----------------|
+| `platform-domain` | Pure domain model — Consent/Payment state machines, Money, Account… **zero framework dependencies** |
+| `platform-application` | Use cases (`AisService`, `PisService`), plain Java behind ports |
+| `platform-api` | REST controllers, `/api/v1`, uniform error mapping |
+| `platform-persistence` | JPA entities + adapters (domain stays JPA-free), Flyway migrations |
+| `platform-webhooks` | Signed event dispatch with retry |
+| `platform-security` | OAuth/token concerns (expands with FAPI in Phase 2) |
+| `platform-bootstrap` | The runnable app: wiring, configuration |
+| `providers/provider-sdk` | **The plugin contract** — the only provider thing core code may depend on |
+| `providers/mock-bank` | Reference connector + standalone bank simulator |
+
+## The plugin model
+
+```
+Core Platform ──▶ provider-sdk (contract) ──▶ mock-bank-connector
+                                          ──▶ your-bank-connector (Phase 2+)
+```
+
+Connectors declare capabilities, are resolved through `ProviderRegistry`, and remain stateless — session state threads through call parameters. The simulator is a **separate process** from its connector, so connector code crosses a real network/OAuth boundary and swapping in a real bank is additive.
+
+## Invariants the build enforces
+
+- `platform-domain` cannot depend on Spring (module has no such dependency to leak)
+- Core modules cannot reference a concrete connector (only `provider-sdk` is on their path)
+- Formatting (Spotless), tests, and the OpenAPI spec ↔ implementation contract are all CI gates
+
+## Decision record
+
+Every significant choice has an ADR in [`adr/`](https://github.com/texashedgeem/yapilayer/tree/main/adr) — twelve at Phase 1: monorepo boundaries, Gradle, mock-bank-first, the provider contract, spec-first OpenAPI, Flyway, JPA, platform-as-BFF, multi-tenancy seam, the NatWest-flavoured mock, webhook delivery, SDK tooling.

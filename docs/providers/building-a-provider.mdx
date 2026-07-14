@@ -1,0 +1,35 @@
+---
+title: Building a provider
+description: Connect a bank by implementing the provider contract
+---
+
+Adding a bank to Yapilayer means adding a module — never touching the core. The worked example throughout is `providers/mock-bank/`, the reference connector.
+
+## The contract
+
+Three interfaces in `providers/provider-sdk` ([ADR 0004](https://github.com/texashedgeem/yapilayer/blob/main/adr/0004-provider-interface-contract.md)):
+
+```java
+public interface BankConnector {
+    ProviderDescriptor descriptor();                    // id, name, country, capabilities
+    default Optional<AisProviderPort> aisPort() { … }   // present iff AIS declared
+    default Optional<PisProviderPort> pisPort() { … }   // present iff PIS declared
+}
+```
+
+`AisProviderPort` covers the consent → authorise → exchange → accounts/balances/transactions flow; `PisProviderPort` covers payment consent → authorise → submit → status. Two rules make connectors composable:
+
+1. **Stateless** — all consent/session state arrives through method parameters (`ProviderSession`); never cache tokens in the connector.
+2. **Errors stay wrapped** — throw `ProviderException`; bank-specific error details must not leak upward.
+
+## Steps
+
+1. **Create the module** — `providers/your-bank/`, add one line to `settings.gradle.kts`, depend on `provider-sdk`. Connectors need no Spring: the mock connector is plain Java + Jackson over the JDK HTTP client.
+2. **Implement the descriptor** — declare only the capabilities the bank actually supports.
+3. **Implement the ports** — map the bank's API to the domain types (`Account`, `Balance`, `Transaction`, `PaymentStatus`). If the bank distinguishes API host from customer-facing authorisation host, take both URLs (the mock connector's `apiBaseUrl`/`publicBaseUrl` split).
+4. **Register it** — add the connector to `ProvidersConfiguration` in `platform-bootstrap` with its configuration properties.
+5. **Test it** — the pattern in `ConnectorEndToEndTest`: drive the real connector through complete AIS and PIS journeys against the bank's sandbox (or your own simulator).
+
+## Documentation expectations
+
+Per `PRODUCT_REQUIREMENTS.md` §10, each real-bank connector ships with: the developer-portal URL and sandbox registration steps, certificate requirements, OAuth configuration, and known limitations. Put this in the module's README.

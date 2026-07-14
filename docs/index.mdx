@@ -3,21 +3,29 @@ title: Yapilayer
 description: The open-source Open Banking platform
 ---
 
-Yapilayer is an open-source Open Banking platform — a secure, extensible, standards-compliant foundation for connecting to financial institutions, starting with UK Open Banking.
+Yapilayer is an open-source Open Banking platform: a self-hostable core that exposes stable AIS and PIS APIs, with all bank connectivity delivered through a plugin framework. It is an alternative to commercial providers (Yapily, TrueLayer, Plaid, Tink) for teams that want financial connectivity without proprietary middleware.
 
-<Note>
-  This documentation site is a skeleton (Milestone 0). Full content — getting
-  started, quickstart, AIS/PIS guides, provider development, deployment — is
-  written in Milestone 10. See the repository's `ROADMAP.md` for the plan.
-</Note>
+## What works today
 
-## What Yapilayer provides
+- **Account Information Services (AIS)** — consent lifecycle, account discovery, balances, paginated transactions
+- **Payment Initiation Services (PIS)** — single domestic payments, authorisation journeys, status lifecycle, signed webhooks
+- **Provider plugin framework** — add a bank by implementing a connector module; the core never changes
+- **A bundled mock bank** — a standalone simulated ASPSP so every journey works end-to-end with zero external dependencies
+- **Generated SDKs** — TypeScript and Java, generated from the OpenAPI specification
+- **Two demo applications** — complete AIS and PIS reference frontends
 
-- **Account Information Services (AIS)** — consent management, account discovery, balances, transactions
-- **Payment Initiation Services (PIS)** — payment creation, authorisation journeys, status tracking, webhooks
-- **A provider plugin framework** — add a bank by implementing a connector module, never by changing the core
-- **Generated SDKs** — Java and TypeScript, generated from the OpenAPI specification
+## Fastest start
 
-## Source
+```bash
+git clone https://github.com/texashedgeem/yapilayer.git
+cd yapilayer/docker
+docker compose up -d --build
+```
 
-The project lives at [github.com/texashedgeem/yapilayer](https://github.com/texashedgeem/yapilayer) under the Apache 2.0 licence.
+Then open [http://localhost:5173](http://localhost:5173) (AIS demo) and [http://localhost:5174](http://localhost:5174) (PIS demo). See the [Quickstart](/quickstart/quickstart) for the API-level journey.
+
+## Where to go next
+
+- [Introduction](/getting-started/introduction) — concepts and architecture in five minutes
+- [Quickstart](/quickstart/quickstart) — first consent and first payment via the API
+- [Build a provider](/providers/building-a-provider) — connect a real bank
