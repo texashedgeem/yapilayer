@@ -2,7 +2,6 @@ package io.yapilayer.platform.application.pis;
 
 import io.yapilayer.platform.domain.payment.PaymentId;
 import io.yapilayer.provider.sdk.ais.ProviderSession;
-
 import java.util.Optional;
 
 /** Storage port for payment provider sessions, implemented by platform-persistence. */

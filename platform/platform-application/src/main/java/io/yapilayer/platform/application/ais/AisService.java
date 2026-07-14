@@ -17,7 +17,6 @@ import io.yapilayer.provider.sdk.ais.ConsentAuthorisation;
 import io.yapilayer.provider.sdk.ais.PageRequest;
 import io.yapilayer.provider.sdk.ais.ProviderSession;
 import io.yapilayer.provider.sdk.ais.TransactionPage;
-
 import java.net.URI;
 import java.security.SecureRandom;
 import java.time.Clock;
@@ -31,8 +30,8 @@ import java.util.Set;
 /**
  * AIS use cases: consent creation, authorisation callback, account data access.
  *
- * <p>Plain Java — wired as a bean by platform-bootstrap, no framework
- * dependencies here (ENGINEERING_STANDARDS §3.2).
+ * <p>Plain Java — wired as a bean by platform-bootstrap, no framework dependencies here
+ * (ENGINEERING_STANDARDS §3.2).
  */
 public class AisService {
 
@@ -46,11 +45,12 @@ public class AisService {
     private final Clock clock;
     private final SecureRandom random = new SecureRandom();
 
-    public AisService(ProviderRegistry providers,
-                      ConsentRepositoryPort consents,
-                      SessionStorePort sessions,
-                      URI platformCallbackUri,
-                      Clock clock) {
+    public AisService(
+            ProviderRegistry providers,
+            ConsentRepositoryPort consents,
+            SessionStorePort sessions,
+            URI platformCallbackUri,
+            Clock clock) {
         this.providers = providers;
         this.consents = consents;
         this.sessions = sessions;
@@ -66,20 +66,26 @@ public class AisService {
     /**
      * Creates a consent at the provider and returns the bank authorisation URL.
      *
-     * @param clientRedirectUri where the customer is sent after the platform
-     *                          completes the callback exchange
+     * @param clientRedirectUri where the customer is sent after the platform completes the callback
+     *     exchange
      */
-    public CreatedConsent createConsent(ProviderId providerId,
-                                        Set<Permission> permissions,
-                                        URI clientRedirectUri) {
+    public CreatedConsent createConsent(
+            ProviderId providerId, Set<Permission> permissions, URI clientRedirectUri) {
         AisProviderPort port = aisPort(providerId);
         Instant now = clock.instant();
-        Consent consent = Consent.create(TenantId.DEFAULT, providerId, permissions,
-                now, now.plus(DEFAULT_CONSENT_VALIDITY));
+        Consent consent =
+                Consent.create(
+                        TenantId.DEFAULT,
+                        providerId,
+                        permissions,
+                        now,
+                        now.plus(DEFAULT_CONSENT_VALIDITY));
 
         String state = newState();
-        ConsentAuthorisation authorisation = port.createConsent(new AisConsentRequest(
-                permissions, consent.expiresAt(), platformCallbackUri, state));
+        ConsentAuthorisation authorisation =
+                port.createConsent(
+                        new AisConsentRequest(
+                                permissions, consent.expiresAt(), platformCallbackUri, state));
 
         consent = consent.withProviderConsentId(authorisation.providerConsentId());
         consents.save(consent, state, clientRedirectUri);
@@ -87,17 +93,19 @@ public class AisService {
     }
 
     /**
-     * Completes the authorisation journey: validates state, exchanges the code,
-     * stores the session, marks the consent authorised.
+     * Completes the authorisation journey: validates state, exchanges the code, stores the session,
+     * marks the consent authorised.
      */
     public CallbackResult handleCallback(String state, String authorisationCode) {
-        ConsentRepositoryPort.ConsentWithJourney journey = consents.byOauthState(state)
-                .orElseThrow(() -> new NotFoundException("no consent for callback state"));
+        ConsentRepositoryPort.ConsentWithJourney journey =
+                consents.byOauthState(state)
+                        .orElseThrow(() -> new NotFoundException("no consent for callback state"));
         Consent consent = journey.consent();
 
         AisProviderPort port = aisPort(consent.providerId());
-        ProviderSession session = port.exchangeAuthorisationCode(
-                consent.providerConsentId().orElseThrow(), authorisationCode);
+        ProviderSession session =
+                port.exchangeAuthorisationCode(
+                        consent.providerConsentId().orElseThrow(), authorisationCode);
         sessions.save(consent.id(), session);
 
         Consent authorised = consent.authorise(clock.instant());
@@ -107,16 +115,16 @@ public class AisService {
 
     /** Records a denied authorisation. */
     public CallbackResult handleDenied(String state) {
-        ConsentRepositoryPort.ConsentWithJourney journey = consents.byOauthState(state)
-                .orElseThrow(() -> new NotFoundException("no consent for callback state"));
+        ConsentRepositoryPort.ConsentWithJourney journey =
+                consents.byOauthState(state)
+                        .orElseThrow(() -> new NotFoundException("no consent for callback state"));
         Consent rejected = journey.consent().reject();
         consents.update(rejected);
         return new CallbackResult(rejected, journey.clientRedirectUri());
     }
 
     public Consent getConsent(ConsentId id) {
-        return consents.byId(id)
-                .orElseThrow(() -> new NotFoundException("consent not found"));
+        return consents.byId(id).orElseThrow(() -> new NotFoundException("consent not found"));
     }
 
     public List<Account> listAccounts(ConsentId consentId) {
@@ -129,11 +137,11 @@ public class AisService {
         return access.port().getBalances(access.session(), accountId);
     }
 
-    public TransactionPage getTransactions(ConsentId consentId, AccountId accountId,
-                                           Optional<String> pageKey, int pageSize) {
+    public TransactionPage getTransactions(
+            ConsentId consentId, AccountId accountId, Optional<String> pageKey, int pageSize) {
         AuthorisedAccess access = requireAuthorised(consentId);
-        return access.port().getTransactions(access.session(), accountId,
-                new PageRequest(pageKey, pageSize));
+        return access.port()
+                .getTransactions(access.session(), accountId, new PageRequest(pageKey, pageSize));
     }
 
     private record AuthorisedAccess(AisProviderPort port, ProviderSession session) {}
@@ -148,17 +156,26 @@ public class AisService {
             consents.update(consent.expire());
             throw new ConsentNotAuthorisedException("consent has expired");
         }
-        ProviderSession session = sessions.byConsentId(consentId)
-                .orElseThrow(() -> new NotFoundException("no session for consent"));
+        ProviderSession session =
+                sessions.byConsentId(consentId)
+                        .orElseThrow(() -> new NotFoundException("no session for consent"));
         return new AuthorisedAccess(aisPort(consent.providerId()), session);
     }
 
     private AisProviderPort aisPort(ProviderId providerId) {
-        BankConnector connector = providers.byId(providerId)
-                .orElseThrow(() -> new NotFoundException("unknown provider: " + providerId.value()));
-        return connector.aisPort()
-                .orElseThrow(() -> new NotFoundException(
-                        "provider does not support AIS: " + providerId.value()));
+        BankConnector connector =
+                providers
+                        .byId(providerId)
+                        .orElseThrow(
+                                () ->
+                                        new NotFoundException(
+                                                "unknown provider: " + providerId.value()));
+        return connector
+                .aisPort()
+                .orElseThrow(
+                        () ->
+                                new NotFoundException(
+                                        "provider does not support AIS: " + providerId.value()));
     }
 
     private String newState() {

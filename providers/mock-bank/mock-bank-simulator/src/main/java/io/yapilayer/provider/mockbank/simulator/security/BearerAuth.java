@@ -1,18 +1,17 @@
 package io.yapilayer.provider.mockbank.simulator.security;
 
-import io.yapilayer.provider.mockbank.simulator.consent.ConsentStore;
-import io.yapilayer.provider.mockbank.simulator.oauth.TokenStore;
-import org.springframework.stereotype.Component;
-import org.springframework.web.server.ResponseStatusException;
-
-import java.util.Optional;
-
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 
+import io.yapilayer.provider.mockbank.simulator.consent.ConsentStore;
+import io.yapilayer.provider.mockbank.simulator.oauth.TokenStore;
+import java.util.Optional;
+import org.springframework.stereotype.Component;
+import org.springframework.web.server.ResponseStatusException;
+
 /**
- * Resolves the {@code Authorization: Bearer} header to an authorised consent,
- * rejecting missing/invalid tokens (401) and unauthorised consents (403).
+ * Resolves the {@code Authorization: Bearer} header to an authorised consent, rejecting
+ * missing/invalid tokens (401) and unauthorised consents (403).
  */
 @Component
 public class BearerAuth {
@@ -26,16 +25,24 @@ public class BearerAuth {
     }
 
     public ConsentStore.SimConsent requireAuthorisedConsent(String authorizationHeader) {
-        String token = Optional.ofNullable(authorizationHeader)
-                .filter(h -> h.startsWith("Bearer "))
-                .map(h -> h.substring("Bearer ".length()))
-                .orElseThrow(() -> new ResponseStatusException(UNAUTHORIZED, "missing bearer token"));
+        String token =
+                Optional.ofNullable(authorizationHeader)
+                        .filter(h -> h.startsWith("Bearer "))
+                        .map(h -> h.substring("Bearer ".length()))
+                        .orElseThrow(
+                                () ->
+                                        new ResponseStatusException(
+                                                UNAUTHORIZED, "missing bearer token"));
 
-        String consentId = tokens.consentForToken(token)
-                .orElseThrow(() -> new ResponseStatusException(UNAUTHORIZED, "invalid token"));
+        String consentId =
+                tokens.consentForToken(token)
+                        .orElseThrow(
+                                () -> new ResponseStatusException(UNAUTHORIZED, "invalid token"));
 
-        ConsentStore.SimConsent consent = consents.byId(consentId)
-                .orElseThrow(() -> new ResponseStatusException(UNAUTHORIZED, "unknown consent"));
+        ConsentStore.SimConsent consent =
+                consents.byId(consentId)
+                        .orElseThrow(
+                                () -> new ResponseStatusException(UNAUTHORIZED, "unknown consent"));
 
         if (consent.status() != ConsentStore.Status.AUTHORISED) {
             throw new ResponseStatusException(FORBIDDEN, "consent not authorised");

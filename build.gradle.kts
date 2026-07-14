@@ -4,6 +4,21 @@
 plugins {
     alias(libs.plugins.spring.boot) apply false
     alias(libs.plugins.spring.dependency.management) apply false
+    alias(libs.plugins.spotless)
+}
+
+spotless {
+    java {
+        target("platform/**/src/**/*.java", "providers/**/src/**/*.java")
+        targetExclude("**/build/**")
+        googleJavaFormat().aosp() // AOSP style: 4-space indentation
+        removeUnusedImports()
+    }
+    kotlinGradle {
+        target("*.gradle.kts", "platform/**/*.gradle.kts", "providers/**/*.gradle.kts")
+        targetExclude("**/build/**")
+        ktlint()
+    }
 }
 
 allprojects {
@@ -17,15 +32,39 @@ subprojects {
     plugins.withId("java") {
         extensions.configure<JavaPluginExtension> {
             toolchain {
-                languageVersion.set(JavaLanguageVersion.of(libs.versions.java.get().toInt()))
+                languageVersion.set(
+                    JavaLanguageVersion.of(
+                        libs.versions.java
+                            .get()
+                            .toInt(),
+                    ),
+                )
             }
         }
 
         dependencies {
-            "testImplementation"(platform(libs.junit.bom.get().toString()))
-            "testImplementation"(libs.junit.jupiter.get().toString())
-            "testImplementation"(libs.assertj.core.get().toString())
-            "testRuntimeOnly"(libs.junit.platform.launcher.get().toString())
+            "testImplementation"(
+                platform(
+                    libs.junit.bom
+                        .get()
+                        .toString(),
+                ),
+            )
+            "testImplementation"(
+                libs.junit.jupiter
+                    .get()
+                    .toString(),
+            )
+            "testImplementation"(
+                libs.assertj.core
+                    .get()
+                    .toString(),
+            )
+            "testRuntimeOnly"(
+                libs.junit.platform.launcher
+                    .get()
+                    .toString(),
+            )
         }
 
         tasks.withType<Test>().configureEach {

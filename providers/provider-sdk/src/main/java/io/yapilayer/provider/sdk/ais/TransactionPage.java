@@ -1,7 +1,6 @@
 package io.yapilayer.provider.sdk.ais;
 
 import io.yapilayer.platform.domain.account.Transaction;
-
 import java.util.List;
 import java.util.Optional;
 

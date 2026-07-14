@@ -7,8 +7,7 @@ import java.util.Objects;
 /**
  * A monetary amount in a specific currency.
  *
- * <p>Amounts may be negative (debit transactions). Scale is preserved as
- * supplied by the provider.
+ * <p>Amounts may be negative (debit transactions). Scale is preserved as supplied by the provider.
  */
 public record Money(BigDecimal amount, Currency currency) {
 

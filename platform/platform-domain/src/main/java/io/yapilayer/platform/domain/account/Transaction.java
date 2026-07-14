@@ -1,7 +1,6 @@
 package io.yapilayer.platform.domain.account;
 
 import io.yapilayer.platform.domain.common.Money;
-
 import java.time.LocalDate;
 import java.util.Objects;
 import java.util.Optional;
@@ -9,8 +8,8 @@ import java.util.Optional;
 /**
  * A single account transaction.
  *
- * @param id        provider-side transaction reference
- * @param amount    signed amount — negative for debits
+ * @param id provider-side transaction reference
+ * @param amount signed amount — negative for debits
  * @param reference statement reference / narrative, if the provider supplies one
  */
 public record Transaction(

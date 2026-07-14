@@ -3,8 +3,8 @@ package io.yapilayer.provider.sdk;
 /**
  * Capabilities a bank connector may declare (ADR 0004).
  *
- * <p>{@code COP} and {@code VRP} are reserved for Phase 2+ (DECISIONS.md D-3);
- * declaring them has no effect until the corresponding ports exist.
+ * <p>{@code COP} and {@code VRP} are reserved for Phase 2+ (DECISIONS.md D-3); declaring them has
+ * no effect until the corresponding ports exist.
  */
 public enum ProviderCapability {
     /** Account Information Services. */

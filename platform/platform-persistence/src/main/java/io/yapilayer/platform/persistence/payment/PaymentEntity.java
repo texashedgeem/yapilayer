@@ -14,7 +14,6 @@ import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-
 import java.math.BigDecimal;
 import java.net.URI;
 import java.time.Instant;
@@ -27,8 +26,7 @@ import java.util.UUID;
 @Table(name = "payments")
 public class PaymentEntity {
 
-    @Id
-    private UUID id;
+    @Id private UUID id;
 
     @Column(name = "tenant_id", nullable = false)
     private UUID tenantId;
@@ -80,9 +78,11 @@ public class PaymentEntity {
         // JPA
     }
 
-    public static PaymentEntity fromDomain(Payment payment, String oauthState,
-                                           URI clientRedirectUri,
-                                           String providerPaymentConsentId) {
+    public static PaymentEntity fromDomain(
+            Payment payment,
+            String oauthState,
+            URI clientRedirectUri,
+            String providerPaymentConsentId) {
         PaymentEntity entity = new PaymentEntity();
         entity.id = payment.id().value();
         entity.oauthState = oauthState;
@@ -113,7 +113,8 @@ public class PaymentEntity {
                 new TenantId(tenantId),
                 new ProviderId(providerId),
                 new Money(amount, Currency.getInstance(currency)),
-                new Creditor(creditorName,
+                new Creditor(
+                        creditorName,
                         new AccountIdentifier(creditorScheme, creditorIdentification)),
                 reference,
                 status,

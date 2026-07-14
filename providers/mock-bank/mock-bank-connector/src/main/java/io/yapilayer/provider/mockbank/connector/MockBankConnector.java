@@ -6,15 +6,13 @@ import io.yapilayer.provider.sdk.ProviderCapability;
 import io.yapilayer.provider.sdk.ProviderDescriptor;
 import io.yapilayer.provider.sdk.ais.AisProviderPort;
 import io.yapilayer.provider.sdk.pis.PisProviderPort;
-
 import java.net.URI;
 import java.util.Optional;
 import java.util.Set;
 
 /**
- * Reference bank connector: implements the provider SDK against the standalone
- * mock bank simulator (ADR 0003). Behaviourally modelled on NatWest Group's
- * Open Banking implementation (ADR 0010).
+ * Reference bank connector: implements the provider SDK against the standalone mock bank simulator
+ * (ADR 0003). Behaviourally modelled on NatWest Group's Open Banking implementation (ADR 0010).
  */
 public final class MockBankConnector implements BankConnector {
 
@@ -30,18 +28,18 @@ public final class MockBankConnector implements BankConnector {
     }
 
     /**
-     * @param apiBaseUrl    where the platform reaches the simulator's API
-     *                      (e.g. {@code http://mock-bank:8090} inside compose)
-     * @param publicBaseUrl where the <em>customer's browser</em> reaches the
-     *                      simulator for the authorisation journey
-     *                      (e.g. {@code http://localhost:8090})
+     * @param apiBaseUrl where the platform reaches the simulator's API (e.g. {@code
+     *     http://mock-bank:8090} inside compose)
+     * @param publicBaseUrl where the <em>customer's browser</em> reaches the simulator for the
+     *     authorisation journey (e.g. {@code http://localhost:8090})
      */
     public MockBankConnector(URI apiBaseUrl, URI publicBaseUrl) {
-        this.descriptor = new ProviderDescriptor(
-                PROVIDER_ID,
-                "Mock Bank",
-                "GB",
-                Set.of(ProviderCapability.AIS, ProviderCapability.PIS));
+        this.descriptor =
+                new ProviderDescriptor(
+                        PROVIDER_ID,
+                        "Mock Bank",
+                        "GB",
+                        Set.of(ProviderCapability.AIS, ProviderCapability.PIS));
         MockBankHttp http = new MockBankHttp(apiBaseUrl, PROVIDER_ID);
         this.aisPort = new MockBankAisPort(http, publicBaseUrl);
         this.pisPort = new MockBankPisPort(http, publicBaseUrl);

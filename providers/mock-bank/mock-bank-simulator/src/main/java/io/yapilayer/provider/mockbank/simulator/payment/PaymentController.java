@@ -3,6 +3,8 @@ package io.yapilayer.provider.mockbank.simulator.payment;
 import io.yapilayer.provider.mockbank.simulator.consent.AccountAccessConsentController;
 import io.yapilayer.provider.mockbank.simulator.consent.ConsentStore;
 import io.yapilayer.provider.mockbank.simulator.security.BearerAuth;
+import java.time.Instant;
+import java.util.Map;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,12 +16,8 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.time.Instant;
-import java.util.Map;
-
 /**
- * OB Read/Write-style PIS endpoints
- * ({@code /open-banking/v3.1/pisp/domestic-payment-consents} and
+ * OB Read/Write-style PIS endpoints ({@code /open-banking/v3.1/pisp/domestic-payment-consents} and
  * {@code /domestic-payments}).
  */
 @RestController
@@ -37,11 +35,18 @@ public class PaymentController {
     }
 
     @PostMapping("/domestic-payment-consents")
-    public ResponseEntity<Map<String, Object>> createConsent(@RequestBody Map<String, Object> body) {
+    public ResponseEntity<Map<String, Object>> createConsent(
+            @RequestBody Map<String, Object> body) {
         ConsentStore.SimConsent consent = consents.createPis(Instant.now().plusSeconds(24 * 3600));
-        return ResponseEntity.status(HttpStatus.CREATED).body(Map.of("Data", Map.of(
-                "ConsentId", consent.id(),
-                "Status", AccountAccessConsentController.obStatus(consent.status()))));
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(
+                        Map.of(
+                                "Data",
+                                Map.of(
+                                        "ConsentId", consent.id(),
+                                        "Status",
+                                                AccountAccessConsentController.obStatus(
+                                                        consent.status()))));
     }
 
     @SuppressWarnings("unchecked")
@@ -52,16 +57,20 @@ public class PaymentController {
         ConsentStore.SimConsent consent = auth.requireAuthorisedConsent(authorization);
 
         Map<String, Object> data = (Map<String, Object>) body.getOrDefault("Data", Map.of());
-        Map<String, Object> initiation = (Map<String, Object>) data.getOrDefault("Initiation", Map.of());
-        Map<String, Object> amount = (Map<String, Object>) initiation.getOrDefault("InstructedAmount", Map.of());
-        Map<String, Object> creditor = (Map<String, Object>) initiation.getOrDefault("CreditorAccount", Map.of());
+        Map<String, Object> initiation =
+                (Map<String, Object>) data.getOrDefault("Initiation", Map.of());
+        Map<String, Object> amount =
+                (Map<String, Object>) initiation.getOrDefault("InstructedAmount", Map.of());
+        Map<String, Object> creditor =
+                (Map<String, Object>) initiation.getOrDefault("CreditorAccount", Map.of());
 
-        PaymentStore.SimPayment payment = payments.submit(
-                consent.id(),
-                (String) amount.getOrDefault("Amount", "0.00"),
-                (String) amount.getOrDefault("Currency", "GBP"),
-                (String) creditor.getOrDefault("Name", "Unknown"),
-                (String) initiation.getOrDefault("Reference", ""));
+        PaymentStore.SimPayment payment =
+                payments.submit(
+                        consent.id(),
+                        (String) amount.getOrDefault("Amount", "0.00"),
+                        (String) amount.getOrDefault("Currency", "GBP"),
+                        (String) creditor.getOrDefault("Name", "Unknown"),
+                        (String) initiation.getOrDefault("Reference", ""));
 
         return ResponseEntity.status(HttpStatus.CREATED).body(render(payment));
     }
@@ -77,15 +86,19 @@ public class PaymentController {
     }
 
     private static Map<String, Object> render(PaymentStore.SimPayment payment) {
-        return Map.of("Data", Map.of(
-                "DomesticPaymentId", payment.id(),
-                "ConsentId", payment.consentId(),
-                "Status", payment.status(),
-                "Initiation", Map.of(
-                        "InstructedAmount", Map.of(
-                                "Amount", payment.amount(),
-                                "Currency", payment.currency()),
-                        "CreditorAccount", Map.of("Name", payment.creditorName()),
-                        "Reference", payment.reference())));
+        return Map.of(
+                "Data",
+                Map.of(
+                        "DomesticPaymentId", payment.id(),
+                        "ConsentId", payment.consentId(),
+                        "Status", payment.status(),
+                        "Initiation",
+                                Map.of(
+                                        "InstructedAmount",
+                                                Map.of(
+                                                        "Amount", payment.amount(),
+                                                        "Currency", payment.currency()),
+                                        "CreditorAccount", Map.of("Name", payment.creditorName()),
+                                        "Reference", payment.reference())));
     }
 }

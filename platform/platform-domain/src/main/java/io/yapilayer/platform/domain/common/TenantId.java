@@ -6,9 +6,9 @@ import java.util.UUID;
 /**
  * Identifies the tenant (operating organisation) that owns a resource.
  *
- * <p>Multi-tenancy seam (ADR 0009): every aggregate carries a tenant identity
- * from day one because retrofitting one is expensive. Phase 1 runs single-tenant
- * — {@link #DEFAULT} — and no isolation is enforced yet (see KNOWN_GAPS.md).
+ * <p>Multi-tenancy seam (ADR 0009): every aggregate carries a tenant identity from day one because
+ * retrofitting one is expensive. Phase 1 runs single-tenant — {@link #DEFAULT} — and no isolation
+ * is enforced yet (see KNOWN_GAPS.md).
  */
 public record TenantId(UUID value) {
 

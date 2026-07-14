@@ -2,10 +2,9 @@ package io.yapilayer.platform.persistence.webhook;
 
 import io.yapilayer.platform.webhooks.SubscriptionStorePort;
 import io.yapilayer.platform.webhooks.WebhookSubscription;
+import java.util.List;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 /** Implements the webhooks subscription port on Spring Data JPA. */
 @Component
@@ -26,8 +25,6 @@ public class SubscriptionStoreAdapter implements SubscriptionStorePort {
     @Override
     @Transactional(readOnly = true)
     public List<WebhookSubscription> all() {
-        return repository.findAll().stream()
-                .map(WebhookSubscriptionEntity::toDomain)
-                .toList();
+        return repository.findAll().stream().map(WebhookSubscriptionEntity::toDomain).toList();
     }
 }

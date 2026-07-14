@@ -1,16 +1,16 @@
 # Project Status
 
 **Phase:** 1 — reference implementation
-**Current milestone:** 9 — CI/CD completion
+**Current milestone:** 10 — Documentation site
 **Last updated:** 2026-07-14
 
 ## Now
 
-Milestone 9: CI/CD completion — static analysis, enforced dependency/container scanning, release automation in release.yml.
+Milestone 10: populating the Mintlify documentation site — getting started, quickstart, AIS/PIS guides, provider development guide, architecture, deployment, SDKs.
 
 ## Next
 
-Milestone 10 — documentation site (full Mintlify content).
+Milestone 11 — contribution framework verification.
 
 ## Notes for maintainer
 
@@ -30,6 +30,7 @@ Ten Dependabot PRs (#1–#10) opened on first activation are superseded: majors 
 | 2026-07-14 | M6 complete | ais-demo + pis-demo SPAs (platform-as-BFF per ADR 0008 resolution), 3 Playwright e2e specs green against the compose stack, public/internal base-url split |
 | 2026-07-14 | M7 complete | TS + Java SDKs generated (ADR 0012), contract tests via generated SDK green, spec lints clean |
 | 2026-07-14 | M8 complete | Five-service compose stack healthy from one command, demos nginx-served, e2e green against containers, .env.example + quickstart docs |
+| 2026-07-14 | M9 complete | Spotless enforced, SDK-freshness + spec-lint CI jobs, Trivy scanning, release.yml completed, e2e workflow on main pushes |
 
 ## Blockers
 

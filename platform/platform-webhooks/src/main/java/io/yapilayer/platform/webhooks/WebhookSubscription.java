@@ -5,9 +5,8 @@ import java.util.Objects;
 import java.util.UUID;
 
 /**
- * A registered webhook endpoint. The secret signs every delivery
- * (HMAC-SHA256 over the raw body — see ADR 0011) so receivers can verify
- * authenticity.
+ * A registered webhook endpoint. The secret signs every delivery (HMAC-SHA256 over the raw body —
+ * see ADR 0011) so receivers can verify authenticity.
  */
 public record WebhookSubscription(UUID id, URI url, String secret) {
 

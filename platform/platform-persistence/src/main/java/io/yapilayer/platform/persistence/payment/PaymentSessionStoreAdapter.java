@@ -3,10 +3,9 @@ package io.yapilayer.platform.persistence.payment;
 import io.yapilayer.platform.application.pis.PaymentSessionStorePort;
 import io.yapilayer.platform.domain.payment.PaymentId;
 import io.yapilayer.provider.sdk.ais.ProviderSession;
+import java.util.Optional;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Optional;
 
 /** Implements the application-layer payment-session port on Spring Data JPA. */
 @Component
@@ -27,7 +26,6 @@ public class PaymentSessionStoreAdapter implements PaymentSessionStorePort {
     @Override
     @Transactional(readOnly = true)
     public Optional<ProviderSession> byPaymentId(PaymentId paymentId) {
-        return repository.findById(paymentId.value())
-                .map(PaymentSessionEntity::toSession);
+        return repository.findById(paymentId.value()).map(PaymentSessionEntity::toSession);
     }
 }

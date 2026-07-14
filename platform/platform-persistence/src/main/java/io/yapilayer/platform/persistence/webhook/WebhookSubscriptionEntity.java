@@ -5,7 +5,6 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-
 import java.net.URI;
 import java.util.UUID;
 
@@ -14,8 +13,7 @@ import java.util.UUID;
 @Table(name = "webhook_subscriptions")
 public class WebhookSubscriptionEntity {
 
-    @Id
-    private UUID id;
+    @Id private UUID id;
 
     @Column(nullable = false)
     private String url;

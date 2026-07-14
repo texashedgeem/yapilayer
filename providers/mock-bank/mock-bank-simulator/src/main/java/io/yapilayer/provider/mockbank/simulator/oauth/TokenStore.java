@@ -1,15 +1,14 @@
 package io.yapilayer.provider.mockbank.simulator.oauth;
 
-import org.springframework.stereotype.Component;
-
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import org.springframework.stereotype.Component;
 
 /**
- * In-memory OAuth state: authorisation codes (single use) and access tokens,
- * each bound to the consent they authorise.
+ * In-memory OAuth state: authorisation codes (single use) and access tokens, each bound to the
+ * consent they authorise.
  */
 @Component
 public class TokenStore {

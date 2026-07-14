@@ -7,12 +7,11 @@ import io.yapilayer.platform.application.pis.PisService;
 import io.yapilayer.platform.webhooks.SubscriptionStorePort;
 import io.yapilayer.platform.webhooks.WebhookDispatcher;
 import io.yapilayer.provider.sdk.ProviderRegistry;
+import java.net.URI;
+import java.time.Clock;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import java.net.URI;
-import java.time.Clock;
 
 /** Wires the PIS application service and the webhook dispatcher. */
 @Configuration
@@ -24,12 +23,13 @@ public class PisConfiguration {
     }
 
     @Bean
-    public PisService pisService(ProviderRegistry providers,
-                                 PaymentRepositoryPort payments,
-                                 PaymentSessionStorePort sessions,
-                                 PaymentEventPublisher events,
-                                 @Value("${yapilayer.payments-callback-url}") URI callbackUrl,
-                                 Clock clock) {
+    public PisService pisService(
+            ProviderRegistry providers,
+            PaymentRepositoryPort payments,
+            PaymentSessionStorePort sessions,
+            PaymentEventPublisher events,
+            @Value("${yapilayer.payments-callback-url}") URI callbackUrl,
+            Clock clock) {
         return new PisService(providers, payments, sessions, events, callbackUrl, clock);
     }
 }

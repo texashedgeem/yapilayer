@@ -4,17 +4,15 @@ import io.yapilayer.platform.domain.account.Account;
 import io.yapilayer.platform.domain.account.AccountId;
 import io.yapilayer.platform.domain.account.Balance;
 import io.yapilayer.platform.domain.consent.ConsentStatus;
-
 import java.util.List;
 
 /**
- * Account Information Services port (ADR 0004). Implemented by connectors that
- * declare the {@code AIS} capability.
+ * Account Information Services port (ADR 0004). Implemented by connectors that declare the {@code
+ * AIS} capability.
  *
- * <p>Flow: {@link #createConsent} → customer authorises at the bank via the
- * returned URL → platform exchanges the callback code with
- * {@link #exchangeAuthorisationCode} → data access with the resulting
- * {@link ProviderSession}.
+ * <p>Flow: {@link #createConsent} → customer authorises at the bank via the returned URL → platform
+ * exchanges the callback code with {@link #exchangeAuthorisationCode} → data access with the
+ * resulting {@link ProviderSession}.
  */
 public interface AisProviderPort {
 

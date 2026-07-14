@@ -2,7 +2,6 @@ package io.yapilayer.provider.sdk.pis;
 
 import io.yapilayer.platform.domain.common.Money;
 import io.yapilayer.platform.domain.payment.Creditor;
-
 import java.net.URI;
 import java.util.Objects;
 
@@ -10,14 +9,10 @@ import java.util.Objects;
  * Request to create a provider-side payment consent for a single domestic payment.
  *
  * @param redirectUri where the bank sends the customer after authorisation
- * @param state       opaque anti-CSRF value the bank must echo back on redirect
+ * @param state opaque anti-CSRF value the bank must echo back on redirect
  */
 public record PaymentRequest(
-        Money amount,
-        Creditor creditor,
-        String reference,
-        URI redirectUri,
-        String state) {
+        Money amount, Creditor creditor, String reference, URI redirectUri, String state) {
 
     public PaymentRequest {
         Objects.requireNonNull(amount, "amount");

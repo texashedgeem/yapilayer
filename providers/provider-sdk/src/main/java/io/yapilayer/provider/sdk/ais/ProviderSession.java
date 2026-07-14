@@ -5,11 +5,11 @@ import java.util.Objects;
 import java.util.Optional;
 
 /**
- * An authorised session against a provider: the access credential obtained by
- * exchanging the customer's authorisation code, tied to a consent.
+ * An authorised session against a provider: the access credential obtained by exchanging the
+ * customer's authorisation code, tied to a consent.
  *
- * <p>Held by the platform (platform-security manages storage/refresh), passed
- * into port calls — connectors never store it.
+ * <p>Held by the platform (platform-security manages storage/refresh), passed into port calls —
+ * connectors never store it.
  */
 public record ProviderSession(
         String providerConsentId,

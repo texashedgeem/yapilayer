@@ -1,16 +1,15 @@
 package io.yapilayer.platform.domain.consent;
 
-import io.yapilayer.platform.domain.common.ProviderId;
-import io.yapilayer.platform.domain.common.TenantId;
-import org.junit.jupiter.api.Test;
-
-import java.time.Duration;
-import java.time.Instant;
-import java.util.Set;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 import static org.assertj.core.api.Assertions.assertThatIllegalStateException;
+
+import io.yapilayer.platform.domain.common.ProviderId;
+import io.yapilayer.platform.domain.common.TenantId;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.Set;
+import org.junit.jupiter.api.Test;
 
 class ConsentTest {
 
@@ -35,9 +34,15 @@ class ConsentTest {
 
     @Test
     void requiresAtLeastOnePermission() {
-        assertThatIllegalArgumentException().isThrownBy(() ->
-                Consent.create(TenantId.DEFAULT, new ProviderId("mock-bank"),
-                        Set.of(), NOW, LATER));
+        assertThatIllegalArgumentException()
+                .isThrownBy(
+                        () ->
+                                Consent.create(
+                                        TenantId.DEFAULT,
+                                        new ProviderId("mock-bank"),
+                                        Set.of(),
+                                        NOW,
+                                        LATER));
     }
 
     @Test
@@ -48,8 +53,8 @@ class ConsentTest {
 
     @Test
     void cannotAuthoriseAfterExpiry() {
-        assertThatIllegalStateException().isThrownBy(() ->
-                newConsent().authorise(LATER.plusSeconds(1)));
+        assertThatIllegalStateException()
+                .isThrownBy(() -> newConsent().authorise(LATER.plusSeconds(1)));
     }
 
     @Test

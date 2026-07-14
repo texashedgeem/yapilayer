@@ -1,15 +1,14 @@
 name: release
 
-# Stub (Milestone 1): builds artifacts on version tags.
-# Completed in Milestone 9 with changelog automation and SDK publishing.
-
 on:
   push:
     tags: ["v*.*.*"]
 
 jobs:
-  build-artifacts:
+  release:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v4
@@ -19,10 +18,18 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
       - name: Build release artifacts
         run: ./gradlew build
-      - name: Upload boot jars
-        uses: actions/upload-artifact@v4
+      - name: Extract changelog section for this release
+        run: |
+          # Everything under "## [Unreleased]" until the next "## [" heading
+          awk '/^## \[Unreleased\]/{flag=1; next} /^## \[/{flag=0} flag' CHANGELOG.md > release-notes.md
+          echo "---" >> release-notes.md
+          echo "Full changelog: https://github.com/${{ github.repository }}/blob/${{ github.ref_name }}/CHANGELOG.md" >> release-notes.md
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
         with:
-          name: yapilayer-${{ github.ref_name }}
-          path: |
+          body_path: release-notes.md
+          files: |
             platform/platform-bootstrap/build/libs/*.jar
             providers/mock-bank/mock-bank-simulator/build/libs/*.jar
+      # SDK publishing (Maven Central / npm) requires registry credentials —
+      # deliberately deferred; see PROJECT_STATUS.md when it becomes relevant.

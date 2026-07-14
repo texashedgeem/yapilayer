@@ -3,7 +3,6 @@ package io.yapilayer.platform.domain.payment;
 import io.yapilayer.platform.domain.common.Money;
 import io.yapilayer.platform.domain.common.ProviderId;
 import io.yapilayer.platform.domain.common.TenantId;
-
 import java.time.Instant;
 import java.util.Objects;
 import java.util.Optional;
@@ -11,12 +10,12 @@ import java.util.Optional;
 /**
  * A single domestic payment initiated through a provider.
  *
- * <p>Immutable — {@link #transitionTo} returns a new instance and rejects moves
- * the {@link PaymentStatus} state machine does not allow.
+ * <p>Immutable — {@link #transitionTo} returns a new instance and rejects moves the {@link
+ * PaymentStatus} state machine does not allow.
  *
- * @param providerPaymentId provider-side payment reference, present once the
- *                          provider has accepted the payment for processing
- * @param reference         payment reference visible to payer and payee
+ * @param providerPaymentId provider-side payment reference, present once the provider has accepted
+ *     the payment for processing
+ * @param reference payment reference visible to payer and payee
  */
 public record Payment(
         PaymentId id,
@@ -56,14 +55,32 @@ public record Payment(
             Creditor creditor,
             String reference,
             Instant now) {
-        return new Payment(PaymentId.random(), tenantId, providerId, amount, creditor,
-                reference, PaymentStatus.PENDING, now, now, Optional.empty());
+        return new Payment(
+                PaymentId.random(),
+                tenantId,
+                providerId,
+                amount,
+                creditor,
+                reference,
+                PaymentStatus.PENDING,
+                now,
+                now,
+                Optional.empty());
     }
 
     /** Records the provider-side payment reference. */
     public Payment withProviderPaymentId(String providerReference, Instant now) {
-        return new Payment(id, tenantId, providerId, amount, creditor, reference,
-                status, createdAt, now, Optional.of(providerReference));
+        return new Payment(
+                id,
+                tenantId,
+                providerId,
+                amount,
+                creditor,
+                reference,
+                status,
+                createdAt,
+                now,
+                Optional.of(providerReference));
     }
 
     public Payment transitionTo(PaymentStatus target, Instant now) {
@@ -71,7 +88,16 @@ public record Payment(
             throw new IllegalStateException(
                     "illegal payment transition " + status + " -> " + target);
         }
-        return new Payment(id, tenantId, providerId, amount, creditor, reference,
-                target, createdAt, now, providerPaymentId);
+        return new Payment(
+                id,
+                tenantId,
+                providerId,
+                amount,
+                creditor,
+                reference,
+                target,
+                createdAt,
+                now,
+                providerPaymentId);
     }
 }

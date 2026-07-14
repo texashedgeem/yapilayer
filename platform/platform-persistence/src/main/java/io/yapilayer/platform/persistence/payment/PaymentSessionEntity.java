@@ -5,7 +5,6 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-
 import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
@@ -46,7 +45,7 @@ public class PaymentSessionEntity {
     }
 
     public ProviderSession toSession() {
-        return new ProviderSession(providerConsentId, accessToken, expiresAt,
-                Optional.ofNullable(refreshToken));
+        return new ProviderSession(
+                providerConsentId, accessToken, expiresAt, Optional.ofNullable(refreshToken));
     }
 }

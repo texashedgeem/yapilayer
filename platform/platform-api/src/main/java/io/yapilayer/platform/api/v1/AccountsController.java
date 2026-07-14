@@ -3,37 +3,43 @@ package io.yapilayer.platform.api.v1;
 import io.yapilayer.platform.application.ais.AisService;
 import io.yapilayer.platform.domain.account.Account;
 import io.yapilayer.platform.domain.account.AccountId;
-import io.yapilayer.platform.domain.account.AccountIdentifier;
-import io.yapilayer.platform.domain.account.Balance;
 import io.yapilayer.platform.domain.account.Transaction;
 import io.yapilayer.platform.domain.consent.ConsentId;
 import io.yapilayer.provider.sdk.ais.TransactionPage;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-
 /** Account data endpoints, scoped under an authorised consent. */
 @RestController
 @RequestMapping("/api/v1/consents/{consentId}/accounts")
 public class AccountsController {
 
-    public record AccountDto(String accountId, String nickname, String currency,
-                             String type, List<IdentifierDto> identifiers) {}
+    public record AccountDto(
+            String accountId,
+            String nickname,
+            String currency,
+            String type,
+            List<IdentifierDto> identifiers) {}
 
     public record IdentifierDto(String scheme, String identification) {}
 
-    public record BalanceDto(String accountId, String type, String amount,
-                             String currency, String timestamp) {}
+    public record BalanceDto(
+            String accountId, String type, String amount, String currency, String timestamp) {}
 
-    public record TransactionDto(String transactionId, String amount, String currency,
-                                 String status, String bookingDate, String reference,
-                                 String merchantName) {}
+    public record TransactionDto(
+            String transactionId,
+            String amount,
+            String currency,
+            String status,
+            String bookingDate,
+            String reference,
+            String merchantName) {}
 
     public record TransactionPageDto(List<TransactionDto> transactions, String nextPageKey) {}
 
@@ -51,15 +57,16 @@ public class AccountsController {
     }
 
     @GetMapping("/{accountId}/balances")
-    public List<BalanceDto> balances(@PathVariable UUID consentId,
-                                     @PathVariable String accountId) {
+    public List<BalanceDto> balances(@PathVariable UUID consentId, @PathVariable String accountId) {
         return ais.getBalances(new ConsentId(consentId), new AccountId(accountId)).stream()
-                .map(b -> new BalanceDto(
-                        b.accountId().value(),
-                        b.type().name(),
-                        b.amount().amount().toPlainString(),
-                        b.amount().currency().getCurrencyCode(),
-                        b.timestamp().toString()))
+                .map(
+                        b ->
+                                new BalanceDto(
+                                        b.accountId().value(),
+                                        b.type().name(),
+                                        b.amount().amount().toPlainString(),
+                                        b.amount().currency().getCurrencyCode(),
+                                        b.timestamp().toString()))
                 .toList();
     }
 
@@ -69,8 +76,12 @@ public class AccountsController {
             @PathVariable String accountId,
             @RequestParam(value = "pageKey", required = false) String pageKey,
             @RequestParam(value = "pageSize", defaultValue = "50") int pageSize) {
-        TransactionPage page = ais.getTransactions(new ConsentId(consentId),
-                new AccountId(accountId), Optional.ofNullable(pageKey), pageSize);
+        TransactionPage page =
+                ais.getTransactions(
+                        new ConsentId(consentId),
+                        new AccountId(accountId),
+                        Optional.ofNullable(pageKey),
+                        pageSize);
         return new TransactionPageDto(
                 page.transactions().stream().map(AccountsController::toDto).toList(),
                 page.nextPageKey().orElse(null));

@@ -2,21 +2,20 @@ package io.yapilayer.platform.domain.consent;
 
 import io.yapilayer.platform.domain.common.ProviderId;
 import io.yapilayer.platform.domain.common.TenantId;
-
 import java.time.Instant;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
 /**
- * An AIS consent: the customer's permission for the platform to access account
- * data at a specific provider.
+ * An AIS consent: the customer's permission for the platform to access account data at a specific
+ * provider.
  *
- * <p>Immutable — lifecycle transitions return a new instance and reject illegal
- * moves (e.g. authorising an expired consent).
+ * <p>Immutable — lifecycle transitions return a new instance and reject illegal moves (e.g.
+ * authorising an expired consent).
  *
- * @param providerConsentId the provider-side consent reference, present once the
- *                          provider has created its consent resource
+ * @param providerConsentId the provider-side consent reference, present once the provider has
+ *     created its consent resource
  */
 public record Consent(
         ConsentId id,
@@ -65,8 +64,15 @@ public record Consent(
 
     /** Records the provider-side consent reference once the provider resource exists. */
     public Consent withProviderConsentId(String reference) {
-        return new Consent(id, tenantId, providerId, permissions, status,
-                createdAt, expiresAt, Optional.of(reference));
+        return new Consent(
+                id,
+                tenantId,
+                providerId,
+                permissions,
+                status,
+                createdAt,
+                expiresAt,
+                Optional.of(reference));
     }
 
     public Consent authorise(Instant now) {
@@ -100,8 +106,7 @@ public record Consent(
 
     private void requireStatus(ConsentStatus required, String action) {
         if (status != required) {
-            throw new IllegalStateException(
-                    "cannot " + action + " a consent in status " + status);
+            throw new IllegalStateException("cannot " + action + " a consent in status " + status);
         }
     }
 
@@ -112,7 +117,14 @@ public record Consent(
     }
 
     private Consent withStatus(ConsentStatus newStatus) {
-        return new Consent(id, tenantId, providerId, permissions, newStatus,
-                createdAt, expiresAt, providerConsentId);
+        return new Consent(
+                id,
+                tenantId,
+                providerId,
+                permissions,
+                newStatus,
+                createdAt,
+                expiresAt,
+                providerConsentId);
     }
 }

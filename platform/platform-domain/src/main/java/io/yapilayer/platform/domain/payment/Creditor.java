@@ -1,7 +1,6 @@
 package io.yapilayer.platform.domain.payment;
 
 import io.yapilayer.platform.domain.account.AccountIdentifier;
-
 import java.util.Objects;
 
 /** The payee of a payment. */

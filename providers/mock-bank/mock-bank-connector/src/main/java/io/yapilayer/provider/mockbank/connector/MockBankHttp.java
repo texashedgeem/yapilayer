@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.yapilayer.platform.domain.common.ProviderId;
 import io.yapilayer.provider.sdk.ProviderException;
-
 import java.io.IOException;
 import java.net.URI;
 import java.net.URLEncoder;
@@ -16,8 +15,8 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
- * Minimal JSON-over-HTTP helper for the mock bank API. Deliberately uses only
- * the JDK HTTP client plus Jackson — connectors do not require Spring.
+ * Minimal JSON-over-HTTP helper for the mock bank API. Deliberately uses only the JDK HTTP client
+ * plus Jackson — connectors do not require Spring.
  */
 final class MockBankHttp {
 
@@ -40,18 +39,22 @@ final class MockBankHttp {
     }
 
     JsonNode getJson(String path, String bearerToken) {
-        HttpRequest request = HttpRequest.newBuilder(resolve(path))
-                .header("Authorization", "Bearer " + bearerToken)
-                .GET()
-                .build();
+        HttpRequest request =
+                HttpRequest.newBuilder(resolve(path))
+                        .header("Authorization", "Bearer " + bearerToken)
+                        .GET()
+                        .build();
         return send(request);
     }
 
     JsonNode postJson(String path, Object body, String bearerToken) {
         try {
-            HttpRequest.Builder builder = HttpRequest.newBuilder(resolve(path))
-                    .header("Content-Type", "application/json")
-                    .POST(HttpRequest.BodyPublishers.ofString(mapper.writeValueAsString(body)));
+            HttpRequest.Builder builder =
+                    HttpRequest.newBuilder(resolve(path))
+                            .header("Content-Type", "application/json")
+                            .POST(
+                                    HttpRequest.BodyPublishers.ofString(
+                                            mapper.writeValueAsString(body)));
             if (bearerToken != null) {
                 builder.header("Authorization", "Bearer " + bearerToken);
             }
@@ -62,14 +65,20 @@ final class MockBankHttp {
     }
 
     JsonNode postForm(String path, Map<String, String> form) {
-        String encoded = form.entrySet().stream()
-                .map(e -> URLEncoder.encode(e.getKey(), StandardCharsets.UTF_8)
-                        + "=" + URLEncoder.encode(e.getValue(), StandardCharsets.UTF_8))
-                .collect(Collectors.joining("&"));
-        HttpRequest request = HttpRequest.newBuilder(resolve(path))
-                .header("Content-Type", "application/x-www-form-urlencoded")
-                .POST(HttpRequest.BodyPublishers.ofString(encoded))
-                .build();
+        String encoded =
+                form.entrySet().stream()
+                        .map(
+                                e ->
+                                        URLEncoder.encode(e.getKey(), StandardCharsets.UTF_8)
+                                                + "="
+                                                + URLEncoder.encode(
+                                                        e.getValue(), StandardCharsets.UTF_8))
+                        .collect(Collectors.joining("&"));
+        HttpRequest request =
+                HttpRequest.newBuilder(resolve(path))
+                        .header("Content-Type", "application/x-www-form-urlencoded")
+                        .POST(HttpRequest.BodyPublishers.ofString(encoded))
+                        .build();
         return send(request);
     }
 
@@ -78,8 +87,12 @@ final class MockBankHttp {
             HttpResponse<String> response =
                     client.send(request, HttpResponse.BodyHandlers.ofString());
             if (response.statusCode() >= 400) {
-                throw new ProviderException(providerId, "mock bank returned HTTP "
-                        + response.statusCode() + " for " + request.uri());
+                throw new ProviderException(
+                        providerId,
+                        "mock bank returned HTTP "
+                                + response.statusCode()
+                                + " for "
+                                + request.uri());
             }
             return mapper.readTree(response.body());
         } catch (IOException e) {

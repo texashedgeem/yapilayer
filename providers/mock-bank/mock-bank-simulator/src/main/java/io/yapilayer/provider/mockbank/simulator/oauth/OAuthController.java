@@ -1,6 +1,8 @@
 package io.yapilayer.provider.mockbank.simulator.oauth;
 
 import io.yapilayer.provider.mockbank.simulator.consent.ConsentStore;
+import java.net.URI;
+import java.util.Map;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -10,15 +12,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.net.URI;
-import java.util.Map;
-
 /**
  * Simulated ASPSP OAuth 2.0 authorisation-code endpoints.
  *
- * <p>{@code GET /oauth/authorize} renders the customer consent page;
- * {@code POST /oauth/authorize/decision} records approval/denial and redirects
- * back to the TPP with a code; {@code POST /oauth/token} exchanges the code.
+ * <p>{@code GET /oauth/authorize} renders the customer consent page; {@code POST
+ * /oauth/authorize/decision} records approval/denial and redirects back to the TPP with a code;
+ * {@code POST /oauth/token} exchanges the code.
  */
 @RestController
 @RequestMapping("/oauth")
@@ -54,7 +53,8 @@ public class OAuthController {
                   <button name="decision" value="deny">Deny</button>
                 </form>
                 </body></html>
-                """.formatted(consentId, consentId, redirectUri, state);
+                """
+                .formatted(consentId, consentId, redirectUri, state);
     }
 
     @PostMapping("/authorize/decision")
@@ -67,27 +67,32 @@ public class OAuthController {
         if (consents.decide(consentId, approved).isEmpty()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
-        String location = approved
-                ? redirectUri + "?code=" + tokens.issueCode(consentId) + "&state=" + state
-                : redirectUri + "?error=access_denied&state=" + state;
+        String location =
+                approved
+                        ? redirectUri + "?code=" + tokens.issueCode(consentId) + "&state=" + state
+                        : redirectUri + "?error=access_denied&state=" + state;
         return ResponseEntity.status(HttpStatus.FOUND).location(URI.create(location)).build();
     }
 
     @PostMapping(value = "/token", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Map<String, Object>> token(
-            @RequestParam("grant_type") String grantType,
-            @RequestParam("code") String code) {
+            @RequestParam("grant_type") String grantType, @RequestParam("code") String code) {
         if (!"authorization_code".equals(grantType)) {
-            return ResponseEntity.badRequest()
-                    .body(Map.of("error", "unsupported_grant_type"));
+            return ResponseEntity.badRequest().body(Map.of("error", "unsupported_grant_type"));
         }
         return tokens.redeemCode(code)
-                .map(consentId -> ResponseEntity.ok(Map.<String, Object>of(
-                        "access_token", tokens.issueToken(consentId),
-                        "token_type", "Bearer",
-                        "expires_in", 3600,
-                        "consent_id", consentId)))
-                .orElse(ResponseEntity.badRequest()
-                        .body(Map.of("error", "invalid_grant")));
+                .map(
+                        consentId ->
+                                ResponseEntity.ok(
+                                        Map.<String, Object>of(
+                                                "access_token",
+                                                tokens.issueToken(consentId),
+                                                "token_type",
+                                                "Bearer",
+                                                "expires_in",
+                                                3600,
+                                                "consent_id",
+                                                consentId)))
+                .orElse(ResponseEntity.badRequest().body(Map.of("error", "invalid_grant")));
     }
 }

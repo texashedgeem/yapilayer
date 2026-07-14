@@ -1,8 +1,8 @@
 package io.yapilayer.platform.domain.account;
 
 /**
- * Provider-scoped account identifier — the reference by which the provider
- * knows this account (not a platform-assigned id).
+ * Provider-scoped account identifier — the reference by which the provider knows this account (not
+ * a platform-assigned id).
  */
 public record AccountId(String value) {
 

@@ -16,7 +16,7 @@ jobs:
           distribution: temurin
           java-version: "21"
       - uses: gradle/actions/setup-gradle@v4
-      - name: Build all JVM modules
+      - name: Build all JVM modules (includes Spotless format check)
         run: ./gradlew build -x test
 
   typescript:
@@ -31,3 +31,23 @@ jobs:
         run: npm ci
       - name: Build TypeScript workspaces
         run: npm run build --workspaces --if-present
+
+  spec:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Lint OpenAPI spec
+        run: npx --yes @stoplight/spectral-cli lint openapi/yapilayer-api.yaml --fail-severity error
+      - name: Check TypeScript SDK is freshly generated from the spec
+        run: |
+          npx --yes @openapitools/openapi-generator-cli generate \
+            -i openapi/yapilayer-api.yaml \
+            -g typescript-fetch \
+            -o sdk/typescript/src \
+            --global-property apis,models,supportingFiles \
+            --additional-properties=supportsES6=true,typescriptThreePlus=true
+          git diff --exit-code sdk/typescript/src \
+            || (echo "::error::sdk/typescript/src is stale — run scripts/generate-sdk.sh and commit" && exit 1)

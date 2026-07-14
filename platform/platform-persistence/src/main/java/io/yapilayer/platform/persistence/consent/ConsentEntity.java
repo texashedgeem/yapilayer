@@ -12,7 +12,6 @@ import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-
 import java.net.URI;
 import java.time.Instant;
 import java.util.Arrays;
@@ -22,15 +21,14 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
- * JPA mapping for consents. Domain objects stay JPA-free (ADR 0007); this
- * entity converts to/from {@link Consent} at the persistence boundary.
+ * JPA mapping for consents. Domain objects stay JPA-free (ADR 0007); this entity converts to/from
+ * {@link Consent} at the persistence boundary.
  */
 @Entity
 @Table(name = "consents")
 public class ConsentEntity {
 
-    @Id
-    private UUID id;
+    @Id private UUID id;
 
     @Column(name = "tenant_id", nullable = false)
     private UUID tenantId;
@@ -65,8 +63,8 @@ public class ConsentEntity {
         // JPA
     }
 
-    public static ConsentEntity fromDomain(Consent consent, String oauthState,
-                                           URI clientRedirectUri) {
+    public static ConsentEntity fromDomain(
+            Consent consent, String oauthState, URI clientRedirectUri) {
         ConsentEntity entity = new ConsentEntity();
         entity.id = consent.id().value();
         entity.oauthState = oauthState;
@@ -79,8 +77,11 @@ public class ConsentEntity {
     public void applyDomain(Consent consent) {
         this.tenantId = consent.tenantId().value();
         this.providerId = consent.providerId().value();
-        this.permissions = consent.permissions().stream()
-                .map(Enum::name).sorted().collect(Collectors.joining(","));
+        this.permissions =
+                consent.permissions().stream()
+                        .map(Enum::name)
+                        .sorted()
+                        .collect(Collectors.joining(","));
         this.status = consent.status();
         this.createdAt = consent.createdAt();
         this.expiresAt = consent.expiresAt();
@@ -88,8 +89,10 @@ public class ConsentEntity {
     }
 
     public Consent toDomain() {
-        Set<Permission> perms = Arrays.stream(permissions.split(","))
-                .map(Permission::valueOf).collect(Collectors.toSet());
+        Set<Permission> perms =
+                Arrays.stream(permissions.split(","))
+                        .map(Permission::valueOf)
+                        .collect(Collectors.toSet());
         return new Consent(
                 new ConsentId(id),
                 new TenantId(tenantId),

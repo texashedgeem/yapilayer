@@ -1,7 +1,6 @@
 package io.yapilayer.platform.domain.account;
 
 import io.yapilayer.platform.domain.common.ProviderId;
-
 import java.util.Currency;
 import java.util.List;
 import java.util.Objects;

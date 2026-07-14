@@ -7,6 +7,8 @@ import io.yapilayer.platform.domain.common.ProviderId;
 import io.yapilayer.platform.domain.payment.Creditor;
 import io.yapilayer.platform.domain.payment.Payment;
 import io.yapilayer.platform.domain.payment.PaymentId;
+import java.net.URI;
+import java.util.UUID;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,24 +18,32 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.net.URI;
-import java.util.UUID;
-
 /** PIS payment endpoints. */
 @RestController
 @RequestMapping("/api/v1/payments")
 public class PaymentsController {
 
-    public record CreatePaymentRequest(String providerId, String amount, String currency,
-                                       CreditorDto creditor, String reference,
-                                       String redirectUri) {}
+    public record CreatePaymentRequest(
+            String providerId,
+            String amount,
+            String currency,
+            CreditorDto creditor,
+            String reference,
+            String redirectUri) {}
 
     public record CreditorDto(String name, String scheme, String identification) {}
 
-    public record PaymentDto(UUID paymentId, String providerId, String status,
-                             String amount, String currency, String creditorName,
-                             String reference, String createdAt, String updatedAt,
-                             String authorisationUrl) {}
+    public record PaymentDto(
+            UUID paymentId,
+            String providerId,
+            String status,
+            String amount,
+            String currency,
+            String creditorName,
+            String reference,
+            String createdAt,
+            String updatedAt,
+            String authorisationUrl) {}
 
     private final PisService pis;
 
@@ -43,14 +53,17 @@ public class PaymentsController {
 
     @PostMapping
     public ResponseEntity<PaymentDto> create(@RequestBody CreatePaymentRequest request) {
-        PisService.CreatedPayment created = pis.createPayment(
-                new ProviderId(request.providerId()),
-                Money.of(request.amount(), request.currency()),
-                new Creditor(request.creditor().name(),
-                        new AccountIdentifier(request.creditor().scheme(),
-                                request.creditor().identification())),
-                request.reference(),
-                URI.create(request.redirectUri()));
+        PisService.CreatedPayment created =
+                pis.createPayment(
+                        new ProviderId(request.providerId()),
+                        Money.of(request.amount(), request.currency()),
+                        new Creditor(
+                                request.creditor().name(),
+                                new AccountIdentifier(
+                                        request.creditor().scheme(),
+                                        request.creditor().identification())),
+                        request.reference(),
+                        URI.create(request.redirectUri()));
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(toDto(created.payment(), created.authorisationUrl()));
     }

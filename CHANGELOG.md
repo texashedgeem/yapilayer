@@ -4,6 +4,13 @@ All notable changes to this project are documented here. Format follows [Keep a 
 
 ## [Unreleased]
 
+### Added — Milestone 9 (CI/CD completion), 2026-07-14
+- Spotless (google-java-format AOSP + ktlint for build scripts) enforced in every build; one-time repo-wide reformat applied
+- build workflow: OpenAPI lint job + SDK-freshness check (regenerates the TS SDK and fails on drift)
+- security workflow: Trivy filesystem scan (vulnerabilities + misconfigurations, HIGH/CRITICAL fail)
+- release workflow completed: tag-triggered GitHub Release with boot jars and the changelog's Unreleased section as release notes (SDK registry publishing deferred — needs credentials)
+- e2e workflow: full compose stack build + SDK contract tests + Playwright browser suite on every main push
+
 ### Added — Milestone 8 (Full-stack Docker Compose), 2026-07-14
 - Demo apps containerized: multi-stage node build → nginx serving the built SPA with `/api` proxied to the platform (SPA-fallback routing for `/connected` and `/paid`)
 - Complete five-service stack (postgres, mock-bank, platform, ais-demo, pis-demo) healthy from one `docker compose up -d --build` — no local toolchain needed

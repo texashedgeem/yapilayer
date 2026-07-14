@@ -5,7 +5,6 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-
 import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
@@ -13,8 +12,8 @@ import java.util.UUID;
 /**
  * JPA mapping for provider sessions (access tokens).
  *
- * <p>Phase 1 limitation: tokens are stored unencrypted (SECURITY.md);
- * encryption-at-rest arrives with platform-security hardening.
+ * <p>Phase 1 limitation: tokens are stored unencrypted (SECURITY.md); encryption-at-rest arrives
+ * with platform-security hardening.
  */
 @Entity
 @Table(name = "provider_sessions")
@@ -51,7 +50,7 @@ public class ProviderSessionEntity {
     }
 
     public ProviderSession toSession() {
-        return new ProviderSession(providerConsentId, accessToken, expiresAt,
-                Optional.ofNullable(refreshToken));
+        return new ProviderSession(
+                providerConsentId, accessToken, expiresAt, Optional.ofNullable(refreshToken));
     }
 }

@@ -3,8 +3,8 @@ package io.yapilayer.provider.sdk;
 import io.yapilayer.platform.domain.common.ProviderId;
 
 /**
- * Base exception for provider connector failures. Connectors wrap
- * bank-specific errors in this type so provider details never leak upward.
+ * Base exception for provider connector failures. Connectors wrap bank-specific errors in this type
+ * so provider details never leak upward.
  */
 public class ProviderException extends RuntimeException {
 
