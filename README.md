@@ -20,9 +20,11 @@ docker compose up -d --build
 
 Then open:
 
-- **http://localhost:5173** — AIS demo: connect the mock bank, authorise, browse accounts, balances and transactions
-- **http://localhost:5174** — PIS demo: create a payment, authorise it, watch the lifecycle complete
-- **http://localhost:8080/api/v1/providers** — the platform API directly
+- **http://localhost:42031** — AIS demo: connect the mock bank, authorise, browse accounts, balances and transactions
+- **http://localhost:42032** — PIS demo: create a payment, authorise it, watch the lifecycle complete
+- **http://localhost:42130/api/v1/providers** — the platform API directly
+
+(Ports per the cross-portfolio registry — apisaurus `docs/PORT-REGISTRY.md`, ADR 0002.)
 
 For local development (Java 21, Node 20+):
 

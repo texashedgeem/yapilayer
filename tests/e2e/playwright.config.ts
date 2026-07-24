@@ -16,14 +16,14 @@ export default defineConfig({
     {
       command: "npm run dev -w @yapilayer/ais-demo",
       cwd: "../..",
-      url: "http://localhost:5173",
+      url: "http://localhost:42031",
       reuseExistingServer: true,
       timeout: 60_000,
     },
     {
       command: "npm run dev -w @yapilayer/pis-demo",
       cwd: "../..",
-      url: "http://localhost:5174",
+      url: "http://localhost:42032",
       reuseExistingServer: true,
       timeout: 60_000,
     },

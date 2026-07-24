@@ -1,3 +1,9 @@
+# Host ports per apisaurus docs/PORT-REGISTRY.md, ADR 0002 (project id 30
+# for platform/postgres/mock-bank, 31/32 for the demo frontends). Only
+# host-side mappings change for postgres/mock-bank/platform — internal
+# container-to-container networking (service-name DNS) is unaffected by host
+# port choices. ais-demo/pis-demo remap both sides to keep Vite's HMR
+# websocket consistent with the externally-visible port.
 name: yapilayer
 
 services:
@@ -8,7 +14,7 @@ services:
       POSTGRES_USER: yapilayer
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-yapilayer-dev}
     ports:
-      - "5432:5432"
+      - "42230:5432"
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U yapilayer -d yapilayer"]
       interval: 5s
@@ -22,7 +28,7 @@ services:
       context: ..
       dockerfile: docker/Dockerfile.mock-bank
     ports:
-      - "8090:8090"
+      - "42730:8090"
     healthcheck:
       test: ["CMD-SHELL", "wget -qO- http://localhost:8090/actuator/health | grep -q UP"]
       interval: 10s
@@ -36,13 +42,13 @@ services:
     environment:
       YAPILAYER_PROVIDERS_MOCK_BANK_BASE_URL: http://mock-bank:8090
       # Customer's browser reaches the simulator via the published host port
-      YAPILAYER_PROVIDERS_MOCK_BANK_PUBLIC_BASE_URL: http://localhost:8090
+      YAPILAYER_PROVIDERS_MOCK_BANK_PUBLIC_BASE_URL: http://localhost:42730
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/yapilayer
       SPRING_DATASOURCE_USERNAME: yapilayer
       SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-yapilayer-dev}
-      YAPILAYER_CALLBACK_URL: http://localhost:8080/api/v1/callback
+      YAPILAYER_CALLBACK_URL: http://localhost:42130/api/v1/callback
     ports:
-      - "8080:8080"
+      - "42130:8080"
     depends_on:
       postgres:
         condition: service_healthy
@@ -60,14 +66,14 @@ services:
       dockerfile: docker/Dockerfile.demo
       args:
         APP: ais-demo
-        PORT: 5173
+        PORT: 42031
     ports:
-      - "5173:5173"
+      - "42031:42031"
     depends_on:
       platform:
         condition: service_healthy
     healthcheck:
-      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:5173/ > /dev/null"]
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:42031/ > /dev/null"]
       interval: 10s
       timeout: 3s
       retries: 6
@@ -78,14 +84,14 @@ services:
       dockerfile: docker/Dockerfile.demo
       args:
         APP: pis-demo
-        PORT: 5174
+        PORT: 42032
     ports:
-      - "5174:5174"
+      - "42032:42032"
     depends_on:
       platform:
         condition: service_healthy
     healthcheck:
-      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:5174/ > /dev/null"]
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:42032/ > /dev/null"]
       interval: 10s
       timeout: 3s
       retries: 6
