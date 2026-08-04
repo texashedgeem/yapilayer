@@ -26,7 +26,7 @@ jobs:
           java-version: "21"
       - uses: gradle/actions/setup-gradle@v4
         if: matrix.language == 'java-kotlin'
-      - uses: github/codeql-action/init@v3
+      - uses: github/codeql-action/init@v3.37.4
         with:
           languages: ${{ matrix.language }}
           # java needs a traced manual build; JS/TS is scanned source-only
@@ -36,7 +36,7 @@ jobs:
         # --no-daemon so the CodeQL tracer sees the compiler; caches disabled so
         # compilation actually re-runs and gets traced
         run: ./gradlew --no-daemon --no-build-cache --no-configuration-cache clean compileJava
-      - uses: github/codeql-action/analyze@v3
+      - uses: github/codeql-action/analyze@v3.37.4
 
   dependency-review:
     if: github.event_name == 'pull_request'
