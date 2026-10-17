@@ -5,7 +5,7 @@ springDependencyManagement = "1.1.7"
 junit = "5.11.4"
 assertj = "3.27.7"
 jackson = "2.18.8"
-testcontainers = "1.20.4"
+testcontainers = "1.21.4"
 slf4j = "2.0.16"
 
 [libraries]
