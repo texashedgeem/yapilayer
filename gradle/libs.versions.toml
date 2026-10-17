@@ -2,7 +2,7 @@
 java = "21"
 springBoot = "3.5.0"
 springDependencyManagement = "1.1.7"
-junit = "5.11.4"
+junit = "5.14.4"
 assertj = "3.27.7"
 jackson = "2.18.8"
 testcontainers = "1.20.4"
